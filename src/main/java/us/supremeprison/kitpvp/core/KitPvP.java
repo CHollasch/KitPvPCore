@@ -23,6 +23,9 @@ public class KitPvP extends JavaPlugin {
     public void onEnable() {
         plugin_instance = this;
 
+        saveDefaultConfig();
+        reloadConfig();
+
         ClassConfig.setWrapped_plugin(this);
         try {
             reloadPluginModules();
@@ -32,7 +35,15 @@ public class KitPvP extends JavaPlugin {
     }
 
     public void onDisable() {
-
+        if (modules.size() > 0) {
+            for (Module key : modules.keySet()) {
+                ClassConfig value = modules.get(key);
+                value.saveAll();
+                key.onDisable();
+            }
+        }
+        
+        reloadConfig();
     }
 
     //====== INSTANTIATION ======
@@ -43,7 +54,6 @@ public class KitPvP extends JavaPlugin {
                 value.saveAll();
                 value.loadAll();
 
-                key.onDisable();
                 key.onEnable();
             }
         } else {
