@@ -10,7 +10,7 @@ import us.supremeprison.kitpvp.core.util.config.ConfigOption;
  */
 public class BeaconDropParty extends Module {
 
-    @ConfigOption(configuration_section = "DropParty-Time-Cycle")
+    @ConfigOption(configuration_section = "DP-TIME-CYCLE")
     private int dp_time_cycle = 5400;
 
     private int dp_time_left = dp_time_cycle;
@@ -27,6 +27,7 @@ public class BeaconDropParty extends Module {
             }
         };
         Bukkit.getScheduler().scheduleSyncRepeatingTask(parent_plugin, dp_task, 20l, 20l);
+        parent_plugin.logMessage(this, "Successfully registered drop party task with a " + dp_time_cycle + " second cycle");
     }
 
     public void launchDropParty() {

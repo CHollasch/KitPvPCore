@@ -3,7 +3,7 @@ package us.supremeprison.kitpvp.core.module;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.Plugin;
+import us.supremeprison.kitpvp.core.KitPvP;
 
 /**
  * @author Connor Hollasch
@@ -11,7 +11,7 @@ import org.bukkit.plugin.Plugin;
  */
 public abstract class Module implements Listener {
 
-    protected Plugin parent_plugin;
+    public KitPvP parent_plugin;
 
     @Getter
     @Setter
