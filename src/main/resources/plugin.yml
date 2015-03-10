@@ -1,0 +1,6 @@
+name: KitPvPCore
+main: us.supremeprison.kitpvp.core.KitPvP
+author: IModZombies4Fun
+version: 1.0.0
+commands:
+  kitpvp: {}
