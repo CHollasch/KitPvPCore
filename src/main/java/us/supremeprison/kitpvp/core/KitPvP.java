@@ -102,6 +102,9 @@ public class KitPvP extends JavaPlugin {
             if (dependencies != null) {
                 String[] all = dependencies.depends_on();
                 for (String dependency : all) {
+                    if (dependency.equalsIgnoreCase(module.getSimpleName()))
+                        break;
+
                     boolean found = false;
                     forModule: for (Module loaded : this.modules.keySet()) {
                         if (loaded.getModule_name().toLowerCase().equals(dependency.toLowerCase())) {

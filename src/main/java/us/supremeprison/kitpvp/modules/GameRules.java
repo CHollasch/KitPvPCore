@@ -15,7 +15,7 @@ import java.util.List;
 public class GameRules extends Module {
 
     @ConfigOption(configuration_section = "GAME-RULES")
-    private List<String> game_rules = new ArrayList<String>(){
+    private List<String> game_rules = new ArrayList<String>() {
         {
             add("doMobSpawning:false");
         }
@@ -26,6 +26,7 @@ public class GameRules extends Module {
         for (String game_rule : game_rules) {
             for (World world : parent_plugin.getServer().getWorlds()) {
                 world.setGameRuleValue(game_rule.split(":")[0], game_rule.split(":")[1]);
+                parent_plugin.logMessage(this, "Set game rule &d" + game_rule.split(":")[0] + "&e to &d" + game_rule.split(":")[1] + " &efor world &6" + world.getName());
             }
         }
     }

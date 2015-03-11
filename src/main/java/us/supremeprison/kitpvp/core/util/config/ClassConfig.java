@@ -1,10 +1,14 @@
 package us.supremeprison.kitpvp.core.util.config;
 
 import lombok.Setter;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.MemorySection;
 import org.bukkit.plugin.Plugin;
 import us.supremeprison.kitpvp.core.module.Module;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Modified to work with KitPvPCore.
@@ -34,7 +38,16 @@ public class ClassConfig {
                 section = "MODULES." + wrapped_module.getModule_name().toUpperCase() + "." + section;
                 if (wrapped_plugin.getConfig().contains(section)) {
                     Object find = wrapped_plugin.getConfig().get(section);
-                    field.set(wrapped_module, find);
+                    if (find instanceof MemorySection && field.get(wrapped_module) instanceof HashMap) {
+                        Map<Object, Object> nMap = new HashMap<>();
+                        ConfigurationSection cfgSec = (ConfigurationSection) find;
+                        for (String key : cfgSec.getKeys(false)) {
+                            Object val = cfgSec.get(key);
+                            nMap.put(key, val);
+                        }
+                        field.set(wrapped_module, nMap);
+                    } else
+                        field.set(wrapped_module, find);
                 } else {
                     if (field.get(wrapped_module) != null) {
                         wrapped_plugin.getConfig().set(section, field.get(wrapped_module));
@@ -90,7 +103,16 @@ public class ClassConfig {
                 String section = option.configuration_section();
                 if (wrapped_plugin.getConfig().contains(section)) {
                     Object find = wrapped_plugin.getConfig().get(section);
-                    field.set(class_container, find);
+                    if (find instanceof MemorySection && field.get(class_container) instanceof HashMap) {
+                        Map<Object, Object> nMap = new HashMap<>();
+                        ConfigurationSection cfgSec = (ConfigurationSection) find;
+                        for (String key : cfgSec.getKeys(false)) {
+                            Object val = cfgSec.get(key);
+                            nMap.put(key, val);
+                        }
+                        field.set(class_container, nMap);
+                    } else
+                        field.set(class_container, find);
                 } else {
                     if (field.get(class_container) != null) {
                         wrapped_plugin.getConfig().set(section, field.get(class_container));
