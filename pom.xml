@@ -52,7 +52,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.3.1</version>
                 <configuration>
-                    <outputDirectory>C:\Users\Connor\Desktop\SideProjects\Side Project Test Server\plugins</outputDirectory>
+                    <outputDirectory>C:\Users\Connor\Desktop\BUSINESS\SupremePrison\KitPvP Test Server\plugins</outputDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -66,7 +66,6 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <minimizeJar>true</minimizeJar>
                             <artifactSet>
                                 <includes>
                                     <include>org.reflections</include>

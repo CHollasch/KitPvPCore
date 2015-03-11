@@ -45,7 +45,8 @@ public class MySQLConnectionPool {
             } catch (Exception exception)
             {
                 plugin_instance.logMessage("MySQLConnectionPool: Error while opening a new connection.");
-                continue;
+                exception.printStackTrace();
+                break;
             }
             plugin_instance.logMessage("MySQLConnectionPool: Successfuly opened a new connection.");
         }
