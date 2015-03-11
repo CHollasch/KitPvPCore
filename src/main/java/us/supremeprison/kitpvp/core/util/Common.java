@@ -7,6 +7,7 @@ import net.minecraft.server.v1_7_R4.NBTTagString;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_7_R4.inventory.CraftItemStack;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -63,6 +64,16 @@ public class Common {
 
 	public static ItemStack craftItem(Material type, String name, String... lore) {
 		return craftItem(type, 1, name, lore);
+	}
+
+	public static void removeOneInHand(Player player) {
+		ItemStack inHand = player.getItemInHand();
+		if (inHand.getAmount() == 1)
+			player.setItemInHand(null);
+		else {
+			inHand.setAmount(inHand.getAmount()-1);
+			player.setItemInHand(inHand);
+		}
 	}
 
 	public static ItemStack addCustomMetadata(ItemStack item, List<String> nbt_data) {

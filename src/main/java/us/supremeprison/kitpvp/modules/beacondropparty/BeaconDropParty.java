@@ -29,7 +29,7 @@ public class BeaconDropParty extends Module {
                 }
             }
         };
-        dp_task_id = Bukkit.getScheduler().scheduleSyncRepeatingTask(parent_plugin, dp_task, 20l, 20l);
+        dp_task_id = schedule(dp_task, 20, 20);
         parent_plugin.logMessage(this, "Successfully registered drop party task with a " + dp_time_cycle + " second cycle");
     }
 

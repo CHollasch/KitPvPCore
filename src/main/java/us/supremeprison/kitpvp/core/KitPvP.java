@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.minecraft.util.io.netty.util.internal.ConcurrentSet;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 import us.supremeprison.kitpvp.core.database.MySQLConnectionPool;
 import us.supremeprison.kitpvp.core.database.MySQLDatabaseInformation;
@@ -55,6 +56,7 @@ public class KitPvP extends JavaPlugin {
 
     public void onDisable() {
         connection_pool.closeConnections();
+        HandlerList.unregisterAll(this);
 
         if (modules.size() > 0) {
             for (Module key : modules.keySet()) {
