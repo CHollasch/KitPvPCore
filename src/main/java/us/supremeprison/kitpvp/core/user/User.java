@@ -11,6 +11,7 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import us.supremeprison.kitpvp.core.KitPvP;
+import us.supremeprison.kitpvp.core.event.UserInitializeEvent;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -53,7 +54,6 @@ public class User {
     private UUID player_uuid;
 
     @Getter
-    @Setter
     private Player player;
 
     public User(UUID uuid) {
@@ -61,6 +61,11 @@ public class User {
         if (Bukkit.getPlayer(uuid) != null)
             player = Bukkit.getPlayer(uuid);
         online_user_map.put(uuid.toString(), this);
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+        Bukkit.getPluginManager().callEvent(new UserInitializeEvent(this));
     }
 
     private static class UserListener implements Listener {

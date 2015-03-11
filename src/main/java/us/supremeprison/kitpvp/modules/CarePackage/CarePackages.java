@@ -26,7 +26,7 @@ import java.util.HashSet;
  * @since 3/10/2015
  */
 @SuppressWarnings("unused")
-@Depend(depends_on = {"modulemanager", "economy"})
+@Depend
 public class CarePackages extends Module {
 
     @ConfigOption(configuration_section = "CARE-PACKAGE-ITEM")

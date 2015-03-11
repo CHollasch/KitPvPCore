@@ -2,6 +2,7 @@ package us.supremeprison.kitpvp.modules.Economy;
 
 import org.bukkit.Material;
 import us.supremeprison.kitpvp.core.module.Module;
+import us.supremeprison.kitpvp.core.module.modifiers.Depend;
 import us.supremeprison.kitpvp.core.module.modifiers.Immutable;
 import us.supremeprison.kitpvp.core.util.config.ConfigOption;
 
@@ -13,6 +14,7 @@ import java.util.HashMap;
  */
 @SuppressWarnings("unused")
 @Immutable(from = Immutable.From.ALL)
+@Depend
 public class Economy extends Module {
 
     @ConfigOption(configuration_section = "ITEM-WORTH")

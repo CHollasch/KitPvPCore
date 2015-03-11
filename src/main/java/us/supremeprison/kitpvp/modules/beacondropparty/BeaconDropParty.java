@@ -2,6 +2,7 @@ package us.supremeprison.kitpvp.modules.BeaconDropParty;
 
 import org.bukkit.Bukkit;
 import us.supremeprison.kitpvp.core.module.Module;
+import us.supremeprison.kitpvp.core.module.modifiers.Depend;
 import us.supremeprison.kitpvp.core.util.config.ConfigOption;
 
 /**
@@ -9,6 +10,7 @@ import us.supremeprison.kitpvp.core.util.config.ConfigOption;
  * @since 3/9/2015
  */
 @SuppressWarnings("unused")
+@Depend
 public class BeaconDropParty extends Module {
 
     private static int dp_task_id;
