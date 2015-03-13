@@ -43,6 +43,11 @@
             <artifactId>reflections</artifactId>
             <version>0.9.9</version>
         </dependency>
+        <dependency>
+            <groupId>com.filoghost</groupId>
+            <artifactId>holo-displays</artifactId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
     <!-- To make development easier. -->
     <build>

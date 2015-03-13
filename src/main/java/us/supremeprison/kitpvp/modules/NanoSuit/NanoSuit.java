@@ -1,22 +1,22 @@
 package us.supremeprison.kitpvp.modules.NanoSuit;
 
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import com.google.common.collect.Lists;
+import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.util.Vector;
-import us.supremeprison.kitpvp.core.event.UserInitializeEvent;
 import us.supremeprison.kitpvp.core.module.Module;
-import us.supremeprison.kitpvp.core.user.User;
+import us.supremeprison.kitpvp.core.util.ParticleEffect;
+import us.supremeprison.kitpvp.core.util.config.ConfigOption;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * @author Connor Hollasch
@@ -31,26 +31,31 @@ public class NanoSuit extends Module {
     private static HashSet<String> cooldown = new HashSet<>();
 
     @Override
+    public void onEnable() {
+        Runnable update = new Runnable() {
+            public void run() {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (hasNanosuit(player)) {
+                        if (player.getGameMode() == GameMode.SURVIVAL
+                                && !player.getAllowFlight()
+                                && player.getLocation().getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR)
+
+                            player.setAllowFlight(true);
+                        else if (player.getGameMode() == GameMode.SURVIVAL && player.isFlying()) {
+                            player.setFlying(false);
+                        }
+                    }
+                }
+            }
+        };
+        scheduleAsync(update, 5, 5);
+    }
+
+    @Override
     public void onDisable() {
         applicable_for_forwards_fling.clear();
         in_double_jump.clear();
         cooldown.clear();
-    }
-
-    @EventHandler
-    public void onUserJoin(UserInitializeEvent event) {
-        User user = event.getUser();
-        if (hasNanosuit(user.getPlayer()) && user.getPlayer().getGameMode() != GameMode.CREATIVE)
-            user.getPlayer().setAllowFlight(true);
-    }
-
-    @EventHandler
-    public void onPlayerRespawn(PlayerRespawnEvent event) {
-        if (!hasNanosuit(event.getPlayer()) &&
-                event.getPlayer().getAllowFlight() &&
-                event.getPlayer().getGameMode() != GameMode.CREATIVE)
-
-            event.getPlayer().setAllowFlight(false);
     }
 
     @EventHandler
@@ -85,45 +90,27 @@ public class NanoSuit extends Module {
         }
     }
 
+    @ConfigOption(configuration_section = "FORWARD-FLING.UPWARDS-FLING")
+    private double upwards_fling = 0.1d;
+
+    @ConfigOption(configuration_section = "FORWARD-FLING.FORWARD-FLING")
+    private double forward_fling = 1.2d;
+
     @EventHandler
     public void onPlayerSneak(PlayerToggleSneakEvent event) {
         if (in_double_jump.contains(event.getPlayer().getName()) && applicable_for_forwards_fling.contains(event.getPlayer().getName())) {
             applicable_for_forwards_fling.remove(event.getPlayer().getName());
-            event.getPlayer().setVelocity(event.getPlayer().getEyeLocation().getDirection().normalize().add(new Vector(0, 0.1, 0)).multiply(1.2));
+            event.getPlayer().setVelocity(event.getPlayer().getEyeLocation().getDirection().normalize().add(new Vector(0, upwards_fling, 0)).multiply(forward_fling));
             event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.IRONGOLEM_THROW, 1, 1);
+            ParticleEffect.CLOUD.display(event.getPlayer().getLocation(), 0.2f, 0f, 0.2f, 0.06f, 30);
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onInventoryClick(final InventoryClickEvent event) {
-        Runnable tick1dleay = new Runnable() {
-            public void run() {
-                check((Player) event.getWhoClicked());
-            }
-        };
-        schedule(tick1dleay, 1);
-    }
+    @ConfigOption(configuration_section = "UPWARDS-FLING")
+    private double initial_upwards_fling = 0.8d;
 
     @EventHandler
-    public void onPlayerGamemodeChange(final PlayerGameModeChangeEvent event) {
-        Runnable tick1dleay = new Runnable() {
-            public void run() {
-                check(event.getPlayer());
-            }
-        };
-        schedule(tick1dleay, 1);
-    }
-
-    private void check(Player player) {
-        if (hasNanosuit(player) && player.getGameMode() != GameMode.CREATIVE) {
-            player.setAllowFlight(true);
-        } else {
-            player.setAllowFlight(false);
-        }
-    }
-
-    @EventHandler
-    public void onPlayerDoubleJump(PlayerToggleFlightEvent event) {
+    public void onPlayerDoubleJump(final PlayerToggleFlightEvent event) {
         Player player = event.getPlayer();
         if (player.getGameMode() == GameMode.CREATIVE)
             return;
@@ -138,9 +125,15 @@ public class NanoSuit extends Module {
                 in_double_jump.add(event.getPlayer().getName());
                 applicable_for_forwards_fling.add(event.getPlayer().getName());
 
-                event.getPlayer().setVelocity(new Vector(0, 0.8, 0));
+                event.getPlayer().setVelocity(event.getPlayer().getVelocity().add(new Vector(0, initial_upwards_fling, 0)));
                 event.getPlayer().setFlying(false);
                 event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.IRONGOLEM_HIT, 1, 1);
+                schedule(new Runnable() {
+                    public void run() {
+                        event.getPlayer().setAllowFlight(false);
+                    }
+                }, 1);
+                ParticleEffect.CLOUD.display(event.getPlayer().getLocation(), 0.2f, 0f, 0.2f, 0.06f, 30);
             } else {
                 event.getPlayer().setFlying(false);
                 event.getPlayer().setAllowFlight(false);
@@ -148,14 +141,26 @@ public class NanoSuit extends Module {
         }
     }
 
-    private static boolean hasNanosuit(Player player) {
+    @ConfigOption(configuration_section = "NANOSUIT-ITEMS")
+    private HashMap<String, String> nano_suit_items = new HashMap<String, String>() {
+        {
+            put("slot1", "CHAINMAIL_HELMET");
+            put("slot2", "CHAINMAIL_CHESTPLATE");
+            put("slot3", "CHAINMAIL_LEGGINGS");
+            put("slot4", "CHAINMAIL_BOOTS");
+        }
+    };
+
+    private boolean hasNanosuit(Player player) {
         EntityEquipment ee = player.getEquipment();
         if (ee.getHelmet() == null || ee.getChestplate() == null || ee.getLeggings() == null || ee.getBoots() == null)
             return false;
 
-        return (ee.getHelmet().getType() == Material.CHAINMAIL_HELMET
-                && ee.getChestplate().getType() == Material.CHAINMAIL_CHESTPLATE
-                && ee.getLeggings().getType() == Material.CHAINMAIL_LEGGINGS
-                && ee.getBoots().getType() == Material.CHAINMAIL_BOOTS);
+        int slot = 0;
+
+        return (nano_suit_items.get("slot" + (++slot)).equalsIgnoreCase(ee.getHelmet().getType().toString())
+                && nano_suit_items.get("slot" + (++slot)).equalsIgnoreCase(ee.getChestplate().getType().toString())
+                && nano_suit_items.get("slot" + (++slot)).equalsIgnoreCase(ee.getLeggings().getType().toString())
+                && nano_suit_items.get("slot" + (++slot)).equalsIgnoreCase(ee.getBoots().getType().toString()));
     }
 }

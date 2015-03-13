@@ -28,6 +28,7 @@ public abstract class Module implements Listener {
     public int schedule(Runnable runnable) {
         if (parent_plugin.isEnabled())
             return Bukkit.getScheduler().scheduleSyncDelayedTask(parent_plugin, runnable);
+
         return -1;
     }
 

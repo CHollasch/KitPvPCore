@@ -6,16 +6,19 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
+import us.supremeprison.kitpvp.core.command.DynamicCommandRegistry;
 import us.supremeprison.kitpvp.core.database.MySQLConnectionPool;
 import us.supremeprison.kitpvp.core.database.MySQLDatabaseInformation;
+import us.supremeprison.kitpvp.core.database.MySQLVars;
 import us.supremeprison.kitpvp.core.module.Module;
-import us.supremeprison.kitpvp.core.module.modifiers.Depend;
+import us.supremeprison.kitpvp.core.module.modifiers.ModuleDependency;
 import us.supremeprison.kitpvp.core.user.User;
 import us.supremeprison.kitpvp.core.util.ReflectionHandler;
+import us.supremeprison.kitpvp.core.util.Todo;
 import us.supremeprison.kitpvp.core.util.config.ClassConfig;
 
-import java.util.HashMap;
-import java.util.List;
+import java.sql.SQLException;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -32,6 +35,8 @@ public class KitPvP extends JavaPlugin {
 
     @Getter
     private MySQLConnectionPool connection_pool;
+    @Getter
+    private MySQLDatabaseInformation database_information;
 
     public void onEnable() {
         plugin_instance = this;
@@ -40,18 +45,46 @@ public class KitPvP extends JavaPlugin {
         reloadConfig();
 
         ClassConfig.setWrapped_plugin(this);
-        try {
-            reloadPluginModules();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        try { reloadPluginModules(); } catch (Exception e) { e.printStackTrace(); }
 
         User.createUserListener();
 
-        MySQLDatabaseInformation info = new MySQLDatabaseInformation();
-        ClassConfig.loadAll(info);
+        database_information = new MySQLDatabaseInformation();
+        ClassConfig.loadAll(database_information);
 
-        connection_pool = new MySQLConnectionPool(this, info);
+        connection_pool = new MySQLConnectionPool(this, database_information);
+        MySQLVars.CREATE_ATTACHMENT_TABLE.executeQuery();
+
+        new DynamicCommandRegistry();
+
+        printTodos();
+    }
+
+    private void printTodos() {
+        List<Class<Object>> all_classes = ReflectionHandler.getClassesInPackage("us.supremeprison.kitpvp", Object.class);
+
+        Set<String> todos = new HashSet<>();
+        for (Class<Object> clazz : all_classes) {
+            if (clazz.getAnnotation(Todo.class) != null) {
+                String[] messages = clazz.getAnnotation(Todo.class).value();
+                for (String message : messages) {
+                    todos.add("Remember to &d\"" + message + "\"&e in the &6" + clazz.getSimpleName() + "&e class!");
+                }
+            }
+        }
+
+        if (todos.size() != 0) {
+            logMessage("");
+            logMessage("------------- PROJECT TODOS -------------");
+            int index = 1;
+            for (String todo : todos) {
+                logMessage("  &3" + index + ". &e" + todo);
+                ++index;
+            }
+            logMessage("-----------------------------------------");
+            logMessage("");
+        }
     }
 
     public void onDisable() {
@@ -99,13 +132,13 @@ public class KitPvP extends JavaPlugin {
     }
 
     private void loadExcessModules(ConcurrentSet<Class<Module>> module_classes) throws Exception {
-        for (Class<? extends Module> module : module_classes) {
-            Depend dependencies = module.getAnnotation(Depend.class);
+        forClassModule: for (Class<? extends Module> module : module_classes) {
+            ModuleDependency dependencies = module.getAnnotation(ModuleDependency.class);
             if (dependencies != null) {
                 String[] all = dependencies.depends_on();
                 for (String dependency : all) {
                     if (dependency.equalsIgnoreCase(module.getSimpleName()))
-                        break;
+                        continue;
 
                     boolean found = false;
                     forModule: for (Module loaded : this.modules.keySet()) {
@@ -116,7 +149,7 @@ public class KitPvP extends JavaPlugin {
                     }
 
                     if (!found)
-                        continue;
+                        continue forClassModule;
                 }
             }
 

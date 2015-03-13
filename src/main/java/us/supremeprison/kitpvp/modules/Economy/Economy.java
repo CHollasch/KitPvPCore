@@ -2,7 +2,7 @@ package us.supremeprison.kitpvp.modules.Economy;
 
 import org.bukkit.Material;
 import us.supremeprison.kitpvp.core.module.Module;
-import us.supremeprison.kitpvp.core.module.modifiers.Depend;
+import us.supremeprison.kitpvp.core.module.modifiers.ModuleDependency;
 import us.supremeprison.kitpvp.core.module.modifiers.Immutable;
 import us.supremeprison.kitpvp.core.util.config.ConfigOption;
 
@@ -14,7 +14,7 @@ import java.util.HashMap;
  */
 @SuppressWarnings("unused")
 @Immutable(from = Immutable.From.ALL)
-@Depend
+@ModuleDependency
 public class Economy extends Module {
 
     @ConfigOption(configuration_section = "ITEM-WORTH")
@@ -27,4 +27,9 @@ public class Economy extends Module {
             put(Material.NETHER_STAR.toString(), 100000000.0);
         }
     };
+
+    @Override
+    public void onEnable() {
+        //Attach economy modules to players
+    }
 }

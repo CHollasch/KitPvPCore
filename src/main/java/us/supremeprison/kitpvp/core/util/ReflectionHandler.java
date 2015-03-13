@@ -594,8 +594,13 @@ public final class ReflectionHandler {
 				catch (ClassNotFoundException e) {
 					e.printStackTrace();
 				}
-				if (c != null && c.getSuperclass().isAssignableFrom(clazz))
-					modules.add((T) c);
+
+				if (c != null) {
+					if (c.getSuperclass() == null && clazz.isAssignableFrom(c))
+						modules.add((T) c);
+					else if (clazz.isAssignableFrom(c.getSuperclass()))
+						modules.add((T) c);
+				}
 			}
 		}
 		try { jFile.close(); } catch (IOException e) { e.printStackTrace(); }

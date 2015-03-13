@@ -1,6 +1,5 @@
 package us.supremeprison.kitpvp.modules.CarePackage;
 
-import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -12,9 +11,10 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 import us.supremeprison.kitpvp.core.module.Module;
-import us.supremeprison.kitpvp.core.module.modifiers.Depend;
+import us.supremeprison.kitpvp.core.module.modifiers.ModuleDependency;
 import us.supremeprison.kitpvp.core.util.Common;
 import us.supremeprison.kitpvp.core.util.ParticleEffect;
+import us.supremeprison.kitpvp.core.util.Todo;
 import us.supremeprison.kitpvp.core.util.config.ConfigOption;
 import us.supremeprison.kitpvp.core.util.math.TrigLookup;
 
@@ -26,7 +26,8 @@ import java.util.HashSet;
  * @since 3/10/2015
  */
 @SuppressWarnings("unused")
-@Depend
+@ModuleDependency
+@Todo("Fill the dropped chest with items")
 public class CarePackages extends Module {
 
     @ConfigOption(configuration_section = "CARE-PACKAGE-ITEM")
@@ -72,8 +73,6 @@ public class CarePackages extends Module {
                     thrown.remove();
                     alive_care_packages.remove(thrown);
 
-                    chest_place_location.getWorld().playSound(chest_place_location, Sound.PORTAL_TRAVEL, 0.3f, 0.5f);
-
                     for (int i = 0; i <= lifetime; i++) {
                         final int offsetI = i*10;
                         final Location next_particle_location = chest_place_location.clone().add(0.0d, (i/7.5), 0.0d);
@@ -91,20 +90,44 @@ public class CarePackages extends Module {
                                     ParticleEffect.FLAME.display(clone, 0f, 0f, 0f, 0f, 1);
                                 }
 
+                                if (offsetI % 40 == 0) {
+                                    next_particle_location.getWorld().playSound(next_particle_location, Sound.FIZZ, 0.3f, 0.5f);
+                                }
+
                                 ParticleEffect.LARGE_SMOKE.display(next_particle_location, 0.7f, 0.7f, 0.7f, 0f, 50);
                             }
                         };
-                        schedule(next, i);
+                        scheduleAsync(next, i);
                     }
 
                     Runnable end = new Runnable() {
-
                         public void run() {
                             old_states.put(chest_place_location,
                                     new MaterialData(chest_place_location.getBlock().getType(), chest_place_location.getBlock().getData()));
                             chest_place_location.getBlock().setType(Material.CHEST);
                             Chest chest = (Chest) chest_place_location.getBlock().getState();
-                            //TODO Fill chest
+
+                            //Find the top center of the chest for spiral effect
+                            final Location start = chest.getLocation().clone().add(0.5, 1, 0.5);
+                            //Create 1/2 of a curve for our trails to follow
+                            for (int i = 0; i < 180; i+=2) {
+                                final int refI = i;
+                                Runnable nextParticlePlace = new Runnable() {
+                                    public void run() {
+                                        //Find the sin of our outer "i" value for proper y curve and outwards spiral
+                                        double sin = TrigLookup.SIN_VALUES[refI] * 2;
+                                        for (int i = 0; i < 360; i+=36) {
+                                            //Create our particle instance location
+                                            Location play = start.clone().add(TrigLookup.COS_VALUES[TrigLookup.refAngleDegs(i+refI)] * sin,
+                                                    sin/2, TrigLookup.SIN_VALUES[TrigLookup.refAngleDegs(i+refI)] * sin);
+                                            //Display the spark effect
+                                            ParticleEffect.FIREWORKS_SPARK.display(play, 0f, 0f, 0f, 0f, 1);
+                                        }
+                                    }
+                                };
+                                scheduleAsync(nextParticlePlace, i/2);
+                            }
+
                             chest_place_location.getWorld().strikeLightningEffect(chest_place_location);
                             ParticleEffect.CLOUD.display(chest_place_location, 0f, 0f, 0f, 0.4f, 150);
                         }
