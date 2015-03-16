@@ -11,12 +11,14 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import us.supremeprison.kitpvp.core.KitPvP;
+import us.supremeprison.kitpvp.core.database.MySQLVars;
 import us.supremeprison.kitpvp.core.event.UserInitializeEvent;
 import us.supremeprison.kitpvp.core.user.attachment.Attachment;
 import us.supremeprison.kitpvp.core.user.attachment.AttachmentManager;
 import us.supremeprison.kitpvp.core.util.Todo;
 
-import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,7 +39,7 @@ public class User {
     }
 
     @Getter
-    private static AttachmentManager attachments = new AttachmentManager();
+    private static AttachmentManager attachments_manager = new AttachmentManager();
 
     @Getter
     @Setter
@@ -47,17 +49,11 @@ public class User {
         return online_user_map.get(player.getUniqueId().toString());
     }
 
-    public static User fromPlayer(UUID uuid) {
-        return online_user_map.get(uuid.toString());
+    public static User removePlayer(Player player) {
+        return online_user_map.remove(player.getUniqueId().toString());
     }
 
-    public static void removePlayer(Player player) {
-        online_user_map.remove(player.getUniqueId().toString());
-    }
-
-    public static void removePlayer(UUID uuid) {
-        online_user_map.remove(uuid.toString());
-    }
+    //===================================================================
 
     @Getter
     private UUID player_uuid;
@@ -66,8 +62,7 @@ public class User {
     private Player player;
 
     @Getter
-    @Setter
-    private HashMap<String, Serializable> player_data = new HashMap<>();
+    private PlayerAttachmentData attachments;
 
     public User(UUID uuid) {
         this.player_uuid = uuid;
@@ -75,15 +70,34 @@ public class User {
             player = Bukkit.getPlayer(uuid);
         online_user_map.put(uuid.toString(), this);
 
-        for (Attachment<?> predefined_attachments : attachments.getAllAttachments()) {
-        }
+        attachments = new PlayerAttachmentData(null);
+        loadUserdata();
     }
 
     private void loadUserdata() {
         Runnable asyncSQL = new Runnable() {
             @Override
             public void run() {
+                try {
+                    ResultSet all_attachment_data = MySQLVars.GET_ALL_ATTACHMENTS.getResultSet(player_uuid.toString());
+                    while (all_attachment_data.next()) {
+                        String label = all_attachment_data.getString("attachment_label");
+                        String data = all_attachment_data.getString("attachment_data");
+                        Attachment<?> attachment_model = attachments_manager.getAttachment(label);
+                        attachments.putDeserializedAttachment(label, attachment_model.deserialize(data));
+                    }
 
+                    for (Attachment predefined_attachments : attachments_manager.getAllAttachments()) {
+                        if (attachments.isRegistered(predefined_attachments))
+                            continue;
+
+                        MySQLVars.INSERT_INTO_ATTACHMENTS.executeQuery(player_uuid.toString(),
+                                predefined_attachments.getAttachment_label(),
+                                predefined_attachments.serialize(predefined_attachments.getDefault_value()));
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
             }
         };
         Bukkit.getScheduler().scheduleAsyncDelayedTask(KitPvP.getPlugin_instance(), asyncSQL);
@@ -107,7 +121,15 @@ public class User {
     }
 
     private void save() {
-
+        for (String attachment_label : attachments.protectedGetAllAttachments().keySet()) {
+            Object value = attachments.protectedGetAllAttachments().get(attachment_label);
+            Attachment matching = attachments_manager.getAttachment(attachment_label);
+            if (matching == null) {
+                MySQLVars.REMOVE_ATTACHMENT.executeQuery(player_uuid.toString(), attachment_label);
+            } else {
+                MySQLVars.INSERT_INTO_ATTACHMENTS.executeQuery(player_uuid.toString(), attachment_label, matching.serialize(value));
+            }
+        }
     }
 
     private static class UserListener implements Listener {
@@ -129,7 +151,7 @@ public class User {
 
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void onPlayerQuit(PlayerQuitEvent event) {
-            User.removePlayer(event.getPlayer());
+            User.removePlayer(event.getPlayer()).save(true);
         }
     }
 }

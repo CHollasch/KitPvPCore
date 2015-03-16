@@ -1,5 +1,7 @@
 package us.supremeprison.kitpvp.core.user.attachment;
 
+import us.supremeprison.kitpvp.core.KitPvP;
+
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -12,7 +14,8 @@ public class AttachmentManager {
     private HashMap<String, Attachment<?>> user_attachments = new HashMap<>();
 
     public void put(Attachment<?> attachment) {
-        user_attachments.put(attachment.getAttachment_label(), attachment);
+        user_attachments.put(attachment.getAttachment_label().toLowerCase(), attachment);
+        KitPvP.getPlugin_instance().logMessage("New attachment (&d" + attachment.getDefault_value().getClass().getTypeName() + ", " + attachment.getAttachment_label() + "&e) registered!");
     }
 
     public Collection<Attachment<?>> getAllAttachments() {
@@ -20,6 +23,6 @@ public class AttachmentManager {
     }
 
     public Attachment<?> getAttachment(String label) {
-        return user_attachments.get(label);
+        return user_attachments.get(label.toLowerCase());
     }
 }

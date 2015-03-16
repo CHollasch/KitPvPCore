@@ -21,8 +21,16 @@ public abstract class CommandModule {
     @Getter
     private String permission;
 
+    public CommandModule(String command) {
+        this(command, new String[0]);
+    }
+
     public CommandModule(String command, String[] aliases) {
-        this(command, aliases, false, "kitpvp.user");
+        this(command, aliases, false);
+    }
+
+    public CommandModule(String command, String[] aliases, boolean can_sender_be_console) {
+        this(command, aliases, can_sender_be_console, "kitpvp.user");
     }
 
     public CommandModule(String command, String[] aliases, boolean can_sender_be_console, String permission) {

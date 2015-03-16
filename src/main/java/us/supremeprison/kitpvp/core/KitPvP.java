@@ -45,6 +45,7 @@ public class KitPvP extends JavaPlugin {
         reloadConfig();
 
         ClassConfig.setWrapped_plugin(this);
+        new DynamicCommandRegistry();
 
         try { reloadPluginModules(); } catch (Exception e) { e.printStackTrace(); }
 
@@ -55,8 +56,6 @@ public class KitPvP extends JavaPlugin {
 
         connection_pool = new MySQLConnectionPool(this, database_information);
         MySQLVars.CREATE_ATTACHMENT_TABLE.executeQuery();
-
-        new DynamicCommandRegistry();
 
         printTodos();
     }
@@ -97,6 +96,10 @@ public class KitPvP extends JavaPlugin {
                 value.saveAll();
                 key.onDisable();
             }
+        }
+
+        for (User user : User.getOnline_user_map().values()) {
+            user.save(false);
         }
 
         User.setOnline_user_map(new ConcurrentHashMap<String, User>());
