@@ -6,7 +6,13 @@
 
     <groupId>us.supremeprison.kitpvp</groupId>
     <artifactId>KitPvPCore</artifactId>
+    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+
+    <modules>
+        <module>KitPvPKitCreator</module>
+        <module>KitPvPMain</module>
+    </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -39,11 +45,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.reflections</groupId>
-            <artifactId>reflections</artifactId>
-            <version>0.9.9</version>
-        </dependency>
-        <dependency>
             <groupId>com.filoghost</groupId>
             <artifactId>holo-displays</artifactId>
             <version>1.0.0</version>
@@ -59,28 +60,6 @@
                 <configuration>
                     <outputDirectory>C:\Users\Connor\Desktop\BUSINESS\SupremePrison\KitPvP Test Server\plugins</outputDirectory>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>1.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <artifactSet>
-                                <includes>
-                                    <include>org.reflections</include>
-                                    <include>org.javassist</include>
-                                    <include>org.google.guava</include>
-                                </includes>
-                            </artifactSet>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

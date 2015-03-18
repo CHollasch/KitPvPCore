@@ -1,0 +1,7 @@
+name: KitPvPKitCreator
+version: 1.0
+main: us.supremeprison.kitpvp.kitcreator.KitCreator
+author: IModZombies4Fun
+commands:
+  ckit:
+    aliases: [createkit, kitcreate, newkit]
