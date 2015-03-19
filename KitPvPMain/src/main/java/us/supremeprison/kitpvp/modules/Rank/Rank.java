@@ -17,6 +17,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
+import java.text.DecimalFormat;
+
 /**
  * @author Connor Hollasch
  * @since 3/17/2015
@@ -68,6 +70,8 @@ public class Rank extends Module {
         return cost;
     }
 
+    private static DecimalFormat df = new DecimalFormat("#.#");
+
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         prefix = ChatColor.translateAlternateColorCodes('&', prefix);
@@ -75,12 +79,12 @@ public class Rank extends Module {
         double kills = Stats.getKills(event.getPlayer());
         double deaths = Stats.getDeaths(event.getPlayer());
 
-        double kdr = (deaths == 0 ? kills : kills/deaths);
+        double kdr = (deaths == 0 ? (kills == 0 ? 1 : 0) : kills/deaths);
 
         String format = prefix.replace("%rank%", getRank(event.getPlayer()) + "")
-                .replace("%kdr%", kdr + "")
+                .replace("%kdr%", df.format(kdr) + "")
                 + " " + event.getFormat();
-        System.out.println(format);
+
         event.setFormat(format);
     }
 

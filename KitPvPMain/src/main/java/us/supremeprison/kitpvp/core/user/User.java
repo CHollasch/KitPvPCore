@@ -15,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import us.supremeprison.kitpvp.core.user.attachment.EasyUserdata;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -61,6 +62,9 @@ public class User {
     @Getter
     private PlayerAttachmentData attachments;
 
+    @Getter
+    private EasyUserdata userdata;
+
     public User(UUID uuid) {
         this.player_uuid = uuid;
         if (Bukkit.getPlayer(uuid) != null)
@@ -68,6 +72,7 @@ public class User {
         online_user_map.put(uuid.toString(), this);
 
         attachments = new PlayerAttachmentData(null);
+        userdata = new EasyUserdata();
         loadUserdata();
     }
 
