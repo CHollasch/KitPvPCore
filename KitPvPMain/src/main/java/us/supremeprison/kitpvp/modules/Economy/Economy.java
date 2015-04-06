@@ -8,6 +8,7 @@ import us.supremeprison.kitpvp.core.module.modifiers.ModuleDependency;
 import us.supremeprison.kitpvp.core.user.User;
 import us.supremeprison.kitpvp.core.user.attachment.Attachment;
 import us.supremeprison.kitpvp.core.user.attachment.common.DoubleAttachment;
+import us.supremeprison.kitpvp.core.util.RoundingMap;
 import us.supremeprison.kitpvp.core.util.config.ConfigOption;
 import us.supremeprison.kitpvp.core.util.messages.Form;
 import org.bukkit.Bukkit;
@@ -30,8 +31,8 @@ public class Economy extends Module {
 
     private static final NumberFormat cashFormat = NumberFormat.getCurrencyInstance();
 
-    @ConfigOption(configuration_section = "ITEM-WORTH")
-    private HashMap<String, Double> item_worth = new HashMap<String, Double>() {
+    @ConfigOption("ITEM-WORTH")
+    public static HashMap<String, Double> item_worth = new HashMap<String, Double>() {
         {
             put(Material.IRON_INGOT.toString(), 25000.0);
             put(Material.GOLD_INGOT.toString(), 100000.0);
@@ -41,7 +42,7 @@ public class Economy extends Module {
         }
     };
 
-    @ConfigOption(configuration_section = "STARTING-BALANCE")
+    @ConfigOption("STARTING-BALANCE")
     private double starting_balance = 0.0;
 
     @Override
@@ -49,6 +50,7 @@ public class Economy extends Module {
         //Attach economy modules to players
         Attachment<Double> economy_attachment = new DoubleAttachment("economy", starting_balance);
         User.getAttachments_manager().put(economy_attachment);
+        parent_plugin.getServer().getPluginManager().registerEvents(new DeathMoney().setEcon(this), parent_plugin);
 
         //Register economy command
         DynamicCommandRegistry.registerCommand(new CommandModule("eco", new String[]{"economy", "money", "bal", "balance", "ebal", "ebalance", "emoney"}, false) {
@@ -141,8 +143,38 @@ public class Economy extends Module {
         });
     }
 
+    public static Material[] chanceRandomBill(int amount) {
+        RoundingMap<Double, String> cashValueChances = new RoundingMap<>();
+        double total = 0.0; for (double x : item_worth.values()) { total += x; }
+
+        double max = 0.0;
+
+        for (String key : item_worth.keySet()) {
+            double value = item_worth.get(key);
+            double next = (total / value);
+            if (max < next)
+                max = next;
+
+            cashValueChances.put(next, key);
+        }
+
+        double random = Math.random() * max;
+        Material[] all = new Material[amount];
+
+        for (int i = 0; i < amount; i++) {
+            all[i] = Material.getMaterial(cashValueChances.get(cashValueChances.getTopKey(random)));
+            random = Math.random() * max;
+        }
+
+        return all;
+    }
+
     public static String getUserCashString(Player player) {
         return cashFormat.format(getMoney(player));
+    }
+
+    public static String formatCash(Double number) {
+        return cashFormat.format(number);
     }
 
     public static void transferMoney(Player from, Player to) {

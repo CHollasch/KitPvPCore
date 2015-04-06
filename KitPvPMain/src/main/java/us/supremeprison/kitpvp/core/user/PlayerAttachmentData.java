@@ -4,6 +4,7 @@ import us.supremeprison.kitpvp.core.user.attachment.Attachment;
 import us.supremeprison.kitpvp.core.user.attachment.AttachmentManager;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Connor Hollasch
@@ -11,9 +12,9 @@ import java.util.HashMap;
  */
 public class PlayerAttachmentData {
 
-    private HashMap<String, Object> attachments = new HashMap<>();
+    private ConcurrentHashMap<String, Object> attachments = new ConcurrentHashMap<>();
 
-    public PlayerAttachmentData(HashMap<String, Object> initial) {
+    public PlayerAttachmentData(ConcurrentHashMap<String, Object> initial) {
         if (initial != null)
             this.attachments = initial;
     }
@@ -53,7 +54,7 @@ public class PlayerAttachmentData {
         }
     }
 
-    protected HashMap<String, Object> protectedGetAllAttachments() {
+    protected ConcurrentHashMap<String, Object> protectedGetAllAttachments() {
         return attachments;
     }
 }

@@ -1,5 +1,7 @@
 package us.supremeprison.kitpvp.core;
 
+import org.bukkit.command.CommandSender;
+import us.supremeprison.kitpvp.core.command.CommandModule;
 import us.supremeprison.kitpvp.core.command.DynamicCommandRegistry;
 import us.supremeprison.kitpvp.core.database.MySQLConnectionPool;
 import us.supremeprison.kitpvp.core.database.MySQLDatabaseInformation;
@@ -10,6 +12,9 @@ import us.supremeprison.kitpvp.core.user.User;
 import us.supremeprison.kitpvp.core.util.ReflectionHandler;
 import us.supremeprison.kitpvp.core.util.Todo;
 import us.supremeprison.kitpvp.core.util.config.ClassConfig;
+import us.supremeprison.kitpvp.core.util.hologram.HologramManager;
+import us.supremeprison.kitpvp.core.util.inventory.InventoryListener;
+import us.supremeprison.kitpvp.core.util.inventory.OpenInventoryData;
 import us.supremeprison.kitpvp.core.util.messages.Form;
 import lombok.Getter;
 import net.minecraft.util.io.netty.util.internal.ConcurrentSet;
@@ -27,16 +32,25 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class KitPvP extends JavaPlugin {
 
+    private static final String MODULE_START = "MODULES.%.";
+
     @Getter
     protected static KitPvP plugin_instance;
 
     @Getter
-    private HashMap<Module, ClassConfig> modules = new HashMap<>();
+    private HashSet<Module> modules = new HashSet<>();
 
     @Getter
     private MySQLConnectionPool connection_pool;
+
     @Getter
     private MySQLDatabaseInformation database_information;
+
+    @Getter
+    private HashMap<String, OpenInventoryData> open_inventories = new HashMap<>();
+
+    @Getter
+    private ClassConfig configuration_manager = new ClassConfig();
 
     public void onEnable() {
         plugin_instance = this;
@@ -46,20 +60,34 @@ public class KitPvP extends JavaPlugin {
 
         createMessageFormatting();
 
-        ClassConfig.setWrapped_plugin(this);
-        new DynamicCommandRegistry();
+        configuration_manager.setWrapped_plugin(this);
 
-        try { reloadPluginModules(); } catch (Exception e) { e.printStackTrace(); }
+        new DynamicCommandRegistry();
+        Bukkit.getPluginManager().registerEvents(new InventoryListener(), this);
 
         User.createUserListener();
 
         database_information = new MySQLDatabaseInformation();
-        ClassConfig.loadAll(database_information);
+        configuration_manager.loadAll(database_information);
 
         connection_pool = new MySQLConnectionPool(this, database_information);
         MySQLVars.CREATE_ATTACHMENT_TABLE.executeQuery();
 
+        try { reloadPluginModules(); } catch (Exception e) { e.printStackTrace(); }
+
         printTodos();
+
+        DynamicCommandRegistry.registerCommand(new CommandModule("kitreload", new String[]{"kitpvpreload", "kprl", "kitpvprl", "krl"}, true, "kitpvp.reload") {
+            @Override
+            public void onCommand(CommandSender sender, String[] args) {
+                try {
+                    reloadPluginModules();
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&aKitPvP&7] &fReloaded!"));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private void createMessageFormatting() {
@@ -99,13 +127,13 @@ public class KitPvP extends JavaPlugin {
             user.save(false);
         }
 
+        HologramManager.disable();
+
         connection_pool.closeConnections();
         HandlerList.unregisterAll(this);
 
         if (modules.size() > 0) {
-            for (Module key : modules.keySet()) {
-                ClassConfig value = modules.get(key);
-                value.saveAll();
+            for (Module key : modules) {
                 key.onDisable();
             }
         }
@@ -125,19 +153,18 @@ public class KitPvP extends JavaPlugin {
     //====== INSTANTIATION ======
     protected void reloadPluginModules() throws Exception {
         if (modules.size() > 0) {
-            for (Module key : modules.keySet()) {
-                ClassConfig value = modules.get(key);
-                value.saveAll();
-                value.loadAll();
-
-                key.onEnable();
+            for (Module key : modules) {
+                key.onDisable();
+                HandlerList.unregisterAll(key);
             }
-        } else {
-            List<Class<Module>> module_classes = ReflectionHandler.getClassesInPackage("us.supremeprison.kitpvp.modules", Module.class);
-            ConcurrentSet<Class<Module>> concurrent_modules = new ConcurrentSet<>();
-            concurrent_modules.addAll(module_classes);
-            loadExcessModules(concurrent_modules);
+
+            modules.clear();
         }
+
+        List<Class<Module>> module_classes = ReflectionHandler.getClassesInPackage("us.supremeprison.kitpvp.modules", Module.class);
+        ConcurrentSet<Class<Module>> concurrent_modules = new ConcurrentSet<>();
+        concurrent_modules.addAll(module_classes);
+        loadExcessModules(concurrent_modules);
     }
 
     private void loadExcessModules(ConcurrentSet<Class<Module>> module_classes) throws Exception {
@@ -150,7 +177,7 @@ public class KitPvP extends JavaPlugin {
                         continue;
 
                     boolean found = false;
-                    forModule: for (Module loaded : this.modules.keySet()) {
+                    forModule: for (Module loaded : this.modules) {
                         if (loaded.getModule_name().toLowerCase().equals(dependency.toLowerCase())) {
                             found = true;
                             break forModule;
@@ -165,18 +192,18 @@ public class KitPvP extends JavaPlugin {
             Module instance = module.newInstance();
             instance.setModule_name(module.getSimpleName());
 
-            logMessage("Created module: &5" + module.getSimpleName());
+            logMessage(instance, "Module loading...");
+
+            getConfiguration_manager().loadAll(instance, MODULE_START.replace("%", instance.getModule_name().toUpperCase()));
 
             instance.parent_plugin = this;
             instance.onEnable();
             Bukkit.getPluginManager().registerEvents(instance, this);
 
-            ClassConfig conf = new ClassConfig();
-            conf.setWrapped_module(instance);
-            conf.loadAll();
-
-            this.modules.put(instance, conf);
+            this.modules.add(instance);
             module_classes.remove(module);
+
+            logMessage(instance, "Module loaded!");
         }
 
         if (module_classes.size() == 0)

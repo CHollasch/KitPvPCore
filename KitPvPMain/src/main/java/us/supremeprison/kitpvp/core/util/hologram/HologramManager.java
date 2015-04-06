@@ -31,7 +31,7 @@ public class HologramManager {
         holograms.remove(hologram);
     }
 
-    public void disable() {
+    public static void disable() {
         for (Hologram h : holograms) {
             h.delete();
         }

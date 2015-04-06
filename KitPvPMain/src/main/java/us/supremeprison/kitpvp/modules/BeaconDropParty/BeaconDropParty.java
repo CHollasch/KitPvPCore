@@ -15,7 +15,7 @@ public class BeaconDropParty extends Module {
 
     private static int dp_task_id;
 
-    @ConfigOption(configuration_section = "DP-TIME-CYCLE")
+    @ConfigOption("DP-TIME-CYCLE")
     private int dp_time_cycle = 5400;
 
     private int dp_time_left = dp_time_cycle;

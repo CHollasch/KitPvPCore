@@ -7,6 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import us.supremeprison.kitpvp.core.KitPvP;
+import us.supremeprison.kitpvp.modules.Kits.Kit;
 
 /**
  * @author Connor Hollasch

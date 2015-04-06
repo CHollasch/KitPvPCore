@@ -202,4 +202,13 @@ public class Common {
 
 		return true;
 	}
+
+	public static String namify(Material type) {
+		if (type.equals(Material.AIR))
+			return "Hand";
+
+		String name = type.toString().replace("_", " ");
+		name = name.substring(0, 1) + name.substring(1).toLowerCase();
+		return name;
+	}
 }

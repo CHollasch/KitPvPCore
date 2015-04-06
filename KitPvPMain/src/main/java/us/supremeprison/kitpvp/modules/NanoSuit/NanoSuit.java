@@ -9,6 +9,7 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.util.Vector;
 import us.supremeprison.kitpvp.core.module.Module;
+import us.supremeprison.kitpvp.core.module.modifiers.ModuleDependency;
 import us.supremeprison.kitpvp.core.util.ParticleEffect;
 import us.supremeprison.kitpvp.core.util.config.ConfigOption;
 
@@ -20,6 +21,7 @@ import java.util.HashSet;
  * @since 3/11/2015
  */
 @SuppressWarnings("unused")
+@ModuleDependency
 public class NanoSuit extends Module {
 
     private static HashSet<String> applicable_for_forwards_fling = new HashSet<>();
@@ -88,10 +90,10 @@ public class NanoSuit extends Module {
         }
     }
 
-    @ConfigOption(configuration_section = "FORWARD-FLING.UPWARDS-FLING")
+    @ConfigOption("FORWARD-FLING.UPWARDS-FLING")
     private double upwards_fling = 0.1d;
 
-    @ConfigOption(configuration_section = "FORWARD-FLING.FORWARD-FLING")
+    @ConfigOption("FORWARD-FLING.FORWARD-FLING")
     private double forward_fling = 1.2d;
 
     @EventHandler
@@ -104,7 +106,7 @@ public class NanoSuit extends Module {
         }
     }
 
-    @ConfigOption(configuration_section = "UPWARDS-FLING")
+    @ConfigOption("UPWARDS-FLING")
     private double initial_upwards_fling = 0.8d;
 
     @EventHandler
@@ -139,7 +141,7 @@ public class NanoSuit extends Module {
         }
     }
 
-    @ConfigOption(configuration_section = "NANOSUIT-ITEMS")
+    @ConfigOption("NANOSUIT-ITEMS")
     private HashMap<String, String> nano_suit_items = new HashMap<String, String>() {
         {
             put("slot1", "CHAINMAIL_HELMET");

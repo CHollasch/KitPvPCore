@@ -17,13 +17,13 @@ import java.util.List;
 @Immutable
 public class ModuleManager extends Module {
 
-    @ConfigOption(configuration_section = "DISABLED-MODULES")
+    @ConfigOption("DISABLED-MODULES")
     private List<String> disabled_modules = new ArrayList<>();
 
     public void onEnable() {
         schedule(new Runnable() {
             public void run() {
-                for (Module module : KitPvP.getPlugin_instance().getModules().keySet()) {
+                for (Module module : KitPvP.getPlugin_instance().getModules()) {
                     if (disabled_modules.contains(module.getModule_name())) {
                         if (checkImmutable(module.getClass()))
                             continue;
@@ -34,7 +34,6 @@ public class ModuleManager extends Module {
                 }
             }
         }, 1);
-
     }
 
     private static boolean checkImmutable(Class<? extends Module> module_class) {

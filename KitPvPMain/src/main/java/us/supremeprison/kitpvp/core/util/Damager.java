@@ -30,7 +30,15 @@ public interface Damager {
 
                 @Override
                 public String getDescription() {
-                    return description.replace("{PLAYER}", damager.getName());
+                    return description;
+                }
+
+                @Override
+                public String toString() {
+                    if (damager == null)
+                        return damage + " dealt (" + description + ")";
+
+                    return damager.getName() + " dealt " + damage + " damage (" + description + ")";
                 }
             };
             return damager_event;

@@ -16,7 +16,7 @@ import java.util.List;
 @ModuleDependency
 public class GameRules extends Module {
 
-    @ConfigOption(configuration_section = "GAME-RULES")
+    @ConfigOption("GAME-RULES")
     private List<String> game_rules = new ArrayList<String>() {
         {
             add("doMobSpawning:false");

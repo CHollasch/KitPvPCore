@@ -10,6 +10,6 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ConfigOption {
 
-    String configuration_section();
+    String value();
 
 }

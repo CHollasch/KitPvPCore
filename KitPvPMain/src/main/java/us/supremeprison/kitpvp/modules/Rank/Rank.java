@@ -1,8 +1,10 @@
 package us.supremeprison.kitpvp.modules.Rank;
 
+import lombok.Getter;
 import us.supremeprison.kitpvp.core.command.CommandModule;
 import us.supremeprison.kitpvp.core.command.DynamicCommandRegistry;
 import us.supremeprison.kitpvp.core.module.Module;
+import us.supremeprison.kitpvp.core.module.modifiers.ModuleDependency;
 import us.supremeprison.kitpvp.core.user.User;
 import us.supremeprison.kitpvp.core.user.attachment.Attachment;
 import us.supremeprison.kitpvp.core.user.attachment.common.IntegerAttachment;
@@ -24,13 +26,15 @@ import java.text.DecimalFormat;
  * @since 3/17/2015
  */
 @SuppressWarnings("unused")
+@ModuleDependency
 public class Rank extends Module {
 
-    @ConfigOption(configuration_section = "RANK-PREFIX")
+    @ConfigOption("RANK-PREFIX")
     private String prefix = "&f&l<&9%kdr%&f&l> <&c%rank%&f&l>&r";
 
-    @ConfigOption(configuration_section = "MAX-RANK")
-    private int max_rank = 50;
+    @ConfigOption("MAX-RANK")
+    @Getter
+    private static int max_rank = 50;
 
     @Override
     public void onEnable() {
@@ -70,19 +74,17 @@ public class Rank extends Module {
         return cost;
     }
 
-    private static DecimalFormat df = new DecimalFormat("#.#");
+    @Getter
+    private static DecimalFormat kdr_decimal_format = new DecimalFormat("#,##0.0#");
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         prefix = ChatColor.translateAlternateColorCodes('&', prefix);
 
-        double kills = Stats.getKills(event.getPlayer());
-        double deaths = Stats.getDeaths(event.getPlayer());
-
-        double kdr = (deaths == 0 ? (kills == 0 ? 1 : 0) : kills/deaths);
+        double kdr = Stats.getKDR(event.getPlayer());
 
         String format = prefix.replace("%rank%", getRank(event.getPlayer()) + "")
-                .replace("%kdr%", df.format(kdr) + "")
+                .replace("%kdr%", kdr_decimal_format.format(kdr) + "")
                 + " " + event.getFormat();
 
         event.setFormat(format);

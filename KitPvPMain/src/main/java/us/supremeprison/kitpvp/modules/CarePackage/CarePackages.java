@@ -18,7 +18,7 @@ import us.supremeprison.kitpvp.core.util.ParticleEffect;
 import us.supremeprison.kitpvp.core.util.Todo;
 import us.supremeprison.kitpvp.core.util.config.ConfigOption;
 import us.supremeprison.kitpvp.core.util.hologram.HologramManager;
-import us.supremeprison.kitpvp.core.util.math.TrigLookup;
+import us.supremeprison.kitpvp.core.util.math.TrigUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,13 +32,15 @@ import java.util.HashSet;
 @Todo("Fill the dropped chest with items")
 public class CarePackages extends Module {
 
-    @ConfigOption(configuration_section = "CARE-PACKAGE-ITEM")
+    @ConfigOption("CARE-PACKAGE-ITEM")
     private String care_package_material = Material.GHAST_TEAR.toString();
 
     private HashSet<Item> alive_care_packages = new HashSet<>();
     private HashMap<Block, MaterialData> old_states = new HashMap<>();
 
     private HashMap<Block, Inventory> care_package_inventories = new HashMap<>();
+
+    private HashMap<Block, Hologram> holograms = new HashMap<>();
 
     @Override
     public void onDisable() {
@@ -55,6 +57,7 @@ public class CarePackages extends Module {
         care_package_inventories.clear();
         alive_care_packages.clear();
         old_states.clear();
+        holograms.clear();
     }
 
     @EventHandler
@@ -86,12 +89,12 @@ public class CarePackages extends Module {
                             public void run() {
                                 //20 particles in circle
                                 for (int i = 0; i < 360; i+= 18) {
-                                    double cos = TrigLookup.COS_VALUES[i];
-                                    double sin = TrigLookup.SIN_VALUES[i];
+                                    double cos = TrigUtils.COS_VALUES[i];
+                                    double sin = TrigUtils.SIN_VALUES[i];
 
                                     Location clone = next_particle_location.clone().add(
-                                            cos * TrigLookup.COS_VALUES[TrigLookup.refAngleDegs(offsetI)]*2, 0.0d,
-                                            sin * TrigLookup.COS_VALUES[TrigLookup.refAngleDegs(offsetI)]*2);
+                                            cos * TrigUtils.COS_VALUES[TrigUtils.refAngleDegs(offsetI)]*2, 0.0d,
+                                            sin * TrigUtils.COS_VALUES[TrigUtils.refAngleDegs(offsetI)]*2);
                                     ParticleEffect.FLAME.display(clone, 0f, 0f, 0f, 0f, 1);
                                 }
 
@@ -107,7 +110,7 @@ public class CarePackages extends Module {
 
                     Runnable end = new Runnable() {
                         public void run() {
-                            if (old_states.containsKey(chest_place_location))
+                            if (care_package_inventories.containsKey(chest_place_location.getBlock()))
                                 return; //for now
 
                             old_states.put(chest_place_location.getBlock(),
@@ -117,9 +120,10 @@ public class CarePackages extends Module {
                             Inventory inv = Bukkit.createInventory(null, 18, Common.center("Care Package"));
                             care_package_inventories.put(chest_place_location.getBlock(), inv);
 
-                            final Hologram care_package_holo = HologramManager.buildHologram(chest_place_location.clone().add(0.5, 0.9, 0.5),
+                            final Hologram care_package_holo = HologramManager.buildHologram(chest_place_location.clone().add(0, 1.5, 0),
                                     ChatColor.translateAlternateColorCodes('&', "&c&lCare Package"),
                                     ChatColor.translateAlternateColorCodes('&', "&7Open to find a bunch of loot!"));
+                            holograms.put(chest_place_location.getBlock(), care_package_holo);
 
                             schedule(new Runnable() {
                                 public void run() {
@@ -138,11 +142,11 @@ public class CarePackages extends Module {
                                 Runnable nextParticlePlace = new Runnable() {
                                     public void run() {
                                         //Find the sin of our outer "i" value for proper y curve and outwards spiral
-                                        double sin = TrigLookup.SIN_VALUES[refI] * 2;
+                                        double sin = TrigUtils.SIN_VALUES[refI] * 2;
                                         for (int i = 0; i < 360; i+=36) {
                                             //Create our particle instance location
-                                            Location play = start.clone().add(TrigLookup.COS_VALUES[TrigLookup.refAngleDegs(i+refI)] * sin,
-                                                    sin/2, TrigLookup.SIN_VALUES[TrigLookup.refAngleDegs(i+refI)] * sin);
+                                            Location play = start.clone().add(TrigUtils.COS_VALUES[TrigUtils.refAngleDegs(i + refI)] * sin,
+                                                    sin/2, TrigUtils.SIN_VALUES[TrigUtils.refAngleDegs(i + refI)] * sin);
                                             //Display the spark effect
                                             ParticleEffect.FIREWORKS_SPARK.display(play, 0f, 0f, 0f, 0f, 1);
                                         }
