@@ -15,6 +15,7 @@ import us.supremeprison.kitpvp.core.KitPvP;
 import us.supremeprison.kitpvp.core.user.User;
 import us.supremeprison.kitpvp.core.util.Common;
 import us.supremeprison.kitpvp.core.util.Damager;
+import us.supremeprison.kitpvp.modules.Killstreak.Killstreak;
 import us.supremeprison.kitpvp.modules.Stats.Stats;
 
 import java.util.HashMap;
@@ -30,7 +31,7 @@ import static us.supremeprison.kitpvp.core.util.Damager.Util.createNewDamageEven
 public class DamageHandler implements Listener {
 
     private final DeathHandler module;
-    private final String DAMAGE_META_TAG = "damage";
+    public static final String DAMAGE_META_TAG = "damage";
 
     public DamageHandler(DeathHandler module) {
         this.module = module;
@@ -96,6 +97,18 @@ public class DamageHandler implements Listener {
         ds.addDamage(taken);
     }
 
+    public static void applyDamageEvent(Player damaged, Damager damager) {
+        User user = User.fromPlayer(damaged);
+
+        if (!user.getUserdata().contains(DAMAGE_META_TAG)) {
+            DamageSet ds = new DamageSet();
+            user.getUserdata().put(DAMAGE_META_TAG, ds);
+        }
+
+        DamageSet ds = user.getUserdata().get(DAMAGE_META_TAG);
+        ds.addDamage(damager);
+    }
+
     @EventHandler
     public void onPlayerHeal(EntityRegainHealthEvent event) {
         if (!(event.getEntity() instanceof Player))
@@ -129,21 +142,24 @@ public class DamageHandler implements Listener {
         event.setKeepLevel(true);
 
         final Player died = event.getEntity();
+        Killstreak.getModule_instance().reset(died);
 
         if (died.hasPermission("kitpvp.donor")) {
             //Spiral arrows!
             final Location start = died.getEyeLocation().clone().add(0.5, 0, 0.5);
 
-            for (int i = 0; i < 360; i+=5) {
+            for (int i = 0; i < 360; i+=10) {
                 final int x = i;
+                final double _x = Math.toRadians(x);
                 Bukkit.getScheduler().scheduleSyncDelayedTask(KitPvP.getPlugin_instance(), new Runnable() {
                     public void run() {
-                        double cos = Math.cos(x) * 1.05;
-                        double sin = Math.sin(x) * 1.05;
+                        double cos = Math.cos(_x);
+                        double sin = Math.sin(_x);
 
-                        Arrow arrow = (Arrow) died.getWorld().spawnEntity(start.add(cos, (10.0/360.0), sin), EntityType.ARROW);
+                        Arrow arrow = (Arrow) died.getWorld().spawnEntity(start.clone().add(cos, 0, sin), EntityType.ARROW);
                         arrow.setFireTicks(20 * 5);
-                        arrow.setVelocity(new Vector(cos, 0.1, sin).normalize());
+                        arrow.setShooter(died);
+                        arrow.setVelocity(new Vector(cos, 0.3, sin).normalize().divide(new Vector(2, 1, 2)));
                     }
                 }, i/10);
             }
@@ -216,6 +232,8 @@ public class DamageHandler implements Listener {
         if (!(actual_killer.isOnline()))
             return;
 
+        Killstreak.getModule_instance().addKill(actual_killer);
+
         User killer = User.fromPlayer(actual_killer);
         Stats.addKills(killer.getPlayer(), 1);
     }
@@ -237,7 +255,7 @@ public class DamageHandler implements Listener {
         }
     }
 
-    private Damager create(Player player, double damage, String desc) {
+    private static Damager create(Player player, double damage, String desc) {
         return Damager.Util.createNewDamageEvenet(player, damage, desc);
     }
 }

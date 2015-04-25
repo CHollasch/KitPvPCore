@@ -1,5 +1,6 @@
 package us.supremeprison.kitpvp.core.user;
 
+import org.bukkit.ChatColor;
 import us.supremeprison.kitpvp.core.KitPvP;
 import us.supremeprison.kitpvp.core.database.MySQLVars;
 import us.supremeprison.kitpvp.core.event.UserInitializeEvent;
@@ -148,12 +149,20 @@ public class User {
 
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void onPlayerJoin(PlayerJoinEvent event) {
-            User.fromPlayer(event.getPlayer()).setPlayer(event.getPlayer());
+            try {
+                User.fromPlayer(event.getPlayer()).setPlayer(event.getPlayer());
+            } catch (Exception ex) {
+                event.getPlayer().kickPlayer(ChatColor.translateAlternateColorCodes('&', "&c&lERROR&7: &fYour userdata could not be loaded, please rejoin again!"));
+            }
         }
 
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
         public void onPlayerQuit(PlayerQuitEvent event) {
-            User.removePlayer(event.getPlayer()).save(true);
+            try {
+                User.removePlayer(event.getPlayer()).save(true);
+            } catch (NullPointerException ex) {
+                KitPvP.getPlugin_instance().logMessage("Could not save userdata for &f" + event.getPlayer().getUniqueId().toString() + "&e!");
+            }
         }
     }
 }

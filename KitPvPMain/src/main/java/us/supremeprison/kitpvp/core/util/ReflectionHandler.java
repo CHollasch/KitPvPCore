@@ -594,10 +594,10 @@ public final class ReflectionHandler {
 					e.printStackTrace();
 				}
 
-				if (c != null) {
+				if (c != null && clazz != null) {
 					if (c.getSuperclass() == null && clazz.isAssignableFrom(c))
 						modules.add((T) c);
-					else if (clazz.isAssignableFrom(c.getSuperclass()))
+					else if (c.getSuperclass() != null && clazz.isAssignableFrom(c.getSuperclass()))
 						modules.add((T) c);
 				}
 			}

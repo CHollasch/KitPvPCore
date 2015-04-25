@@ -60,7 +60,9 @@
             <version>1.7.1</version>
         </dependency>
     </dependencies>
+
     <!-- To make development easier. -->
+
     <build>
         <plugins>
             <plugin>

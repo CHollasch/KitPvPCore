@@ -1,5 +1,6 @@
 package us.supremeprison.kitpvp.modules.Throwables.modules;
 
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -7,7 +8,14 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import us.supremeprison.kitpvp.core.user.User;
+import us.supremeprison.kitpvp.core.util.ArmorUtils;
+import us.supremeprison.kitpvp.core.util.Common;
+import us.supremeprison.kitpvp.core.util.Damager;
 import us.supremeprison.kitpvp.core.util.ParticleEffect;
+import us.supremeprison.kitpvp.modules.DeathHandler.DamageHandler;
+import us.supremeprison.kitpvp.modules.DeathHandler.DamageSet;
+import us.supremeprison.kitpvp.modules.Killstreak.KillstreakReward;
 import us.supremeprison.kitpvp.modules.Throwables.ThrowableItem;
 
 /**
@@ -17,11 +25,12 @@ import us.supremeprison.kitpvp.modules.Throwables.ThrowableItem;
 public class StarfieldBomb extends ThrowableItem {
 
     @Override
-    public void onCreate(final Item item) {
-        final Location clone = item.getLocation();
-
+    public void onCreate(final Player player, final Item item) {
         Runnable delay = new Runnable() {
             public void run() {
+
+                final Location clone = item.getLocation();
+
                 //Do work
                 for (int i = 0; i < (20 * 5); i++) {
                     final int x = i;
@@ -31,6 +40,12 @@ public class StarfieldBomb extends ThrowableItem {
                             ParticleEffect.LARGE_SMOKE.display(clone, 0.2f, 0.2f, 0.2f, 0f, 40);
 
                             for (final Player near : getNearby(clone, 3)) {
+                                if (!near.getGameMode().equals(GameMode.CREATIVE)) {
+                                    double damage = ArmorUtils.recomputeDamage(near, 3.0);
+                                    near.damage(damage);
+                                    DamageHandler.applyDamageEvent(near,
+                                            Damager.Util.createNewDamageEvenet(player, damage, "Sucked in by starfield bomb"));
+                                }
 
                                 if (x % 20 == 0) {
                                     final int random = (int) (Math.random() * near.getInventory().getSize());
@@ -65,5 +80,29 @@ public class StarfieldBomb extends ThrowableItem {
             }
         };
         schedule(delay, 20 * 2);
+    }
+
+
+
+    public static class StarfieldBombReward implements KillstreakReward {
+        @Override
+        public String getName() {
+            return "Starfield Bomb";
+        }
+
+        @Override
+        public ItemStack getIcon() {
+            return Common.craftItem(Material.NETHER_STAR, 1, "&f&l<&bStarfield &7Bomb&f&l>");
+        }
+
+        @Override
+        public int getKills() {
+            return 3;
+        }
+
+        @Override
+        public void giveToPlayer(Player player) {
+            player.getInventory().addItem(getIcon());
+        }
     }
 }

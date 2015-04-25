@@ -19,6 +19,8 @@ import us.supremeprison.kitpvp.core.util.Todo;
 import us.supremeprison.kitpvp.core.util.config.ConfigOption;
 import us.supremeprison.kitpvp.core.util.hologram.HologramManager;
 import us.supremeprison.kitpvp.core.util.math.TrigUtils;
+import us.supremeprison.kitpvp.modules.Killstreak.Killstreak;
+import us.supremeprison.kitpvp.modules.Killstreak.KillstreakReward;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,12 +30,12 @@ import java.util.HashSet;
  * @since 3/10/2015
  */
 @SuppressWarnings("unused")
-@ModuleDependency
+@ModuleDependency(depends_on = {"modulemanager", "killstreak"})
 @Todo("Fill the dropped chest with items")
 public class CarePackages extends Module {
 
     @ConfigOption("CARE-PACKAGE-ITEM")
-    private String care_package_material = Material.GHAST_TEAR.toString();
+    private static String care_package_material = Material.GHAST_TEAR.toString();
 
     private HashSet<Item> alive_care_packages = new HashSet<>();
     private HashMap<Block, MaterialData> old_states = new HashMap<>();
@@ -41,6 +43,11 @@ public class CarePackages extends Module {
     private HashMap<Block, Inventory> care_package_inventories = new HashMap<>();
 
     private HashMap<Block, Hologram> holograms = new HashMap<>();
+
+    @Override
+    public void onEnable() {
+        Killstreak.getModule_instance().addKillstreakReward(new CarePackageReward());
+    }
 
     @Override
     public void onDisable() {
@@ -199,6 +206,29 @@ public class CarePackages extends Module {
             }
 
             care_package_inventories.remove(find);
+        }
+    }
+
+    public static class CarePackageReward implements KillstreakReward {
+
+        @Override
+        public String getName() {
+            return "Care Package";
+        }
+
+        @Override
+        public ItemStack getIcon() {
+            return Common.craftItem(Material.ENDER_CHEST, "&f&l<&5Care &7Package&f&l>");
+        }
+
+        @Override
+        public int getKills() {
+            return 4;
+        }
+
+        @Override
+        public void giveToPlayer(Player player) {
+            Common.give(player, Common.craftItem(Material.valueOf(care_package_material), "&5&lCare Package"));
         }
     }
 }

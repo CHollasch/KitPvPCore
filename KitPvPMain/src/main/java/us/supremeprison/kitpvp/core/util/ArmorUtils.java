@@ -45,7 +45,7 @@ public class ArmorUtils {
                 continue;
 
             if (is.getItemMeta().hasEnchant(Enchantment.PROTECTION_ENVIRONMENTAL)) {
-                armor_val += (is.getEnchantmentLevel(Enchantment.PROTECTION_ENVIRONMENTAL) * 3);
+                armor_val += (is.getEnchantmentLevel(Enchantment.PROTECTION_ENVIRONMENTAL));
             }
 
             if(is.getType() == Material.LEATHER_HELMET)

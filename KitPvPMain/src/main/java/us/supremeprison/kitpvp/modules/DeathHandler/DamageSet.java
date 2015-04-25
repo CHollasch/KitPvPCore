@@ -22,9 +22,13 @@ public class DamageSet {
 
     public void addDamage(Damager damager) {
         //Max of 20 recent damage causes
-        if (all_dealt_damage.size() >= 15) {
-            while (all_dealt_damage.size() >= 15)
-                all_dealt_damage.pop();
+        try {
+            if (all_dealt_damage.size() >= 15) {
+                while (all_dealt_damage.size() >= 15)
+                    all_dealt_damage.pop();
+            }
+        } catch (NoSuchElementException ex) {
+            all_dealt_damage = new LinkedList<>();
         }
 
         all_dealt_damage.add(damager);

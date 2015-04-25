@@ -15,7 +15,9 @@ import java.util.List;
  */
 public abstract class ThrowableItem {
 
-    public abstract void onCreate(Item item);
+    protected String name;
+
+    public abstract void onCreate(Player player, Item item);
 
     public int schedule(Runnable runnable) {
         if (KitPvP.getPlugin_instance().isEnabled())

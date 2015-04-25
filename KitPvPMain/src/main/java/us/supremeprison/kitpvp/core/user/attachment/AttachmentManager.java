@@ -22,6 +22,10 @@ public class AttachmentManager {
         return user_attachments.values();
     }
 
+    public HashMap<String, Attachment<?>> getRegistered_attachments() {
+        return user_attachments;
+    }
+
     public Attachment<?> getAttachment(String label) {
         return user_attachments.get(label.toLowerCase());
     }

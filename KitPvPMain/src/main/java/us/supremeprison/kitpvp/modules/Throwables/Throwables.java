@@ -7,7 +7,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import us.supremeprison.kitpvp.core.module.Module;
+import us.supremeprison.kitpvp.core.module.modifiers.ModuleDependency;
 import us.supremeprison.kitpvp.core.util.Common;
+import us.supremeprison.kitpvp.modules.Killstreak.Killstreak;
 import us.supremeprison.kitpvp.modules.Throwables.modules.StarfieldBomb;
 
 import java.util.HashMap;
@@ -16,6 +18,7 @@ import java.util.HashMap;
  * @author Connor Hollasch
  * @since 4/6/2015
  */
+@ModuleDependency(depends_on = {"modulemanager", "killstreak"})
 public class Throwables extends Module {
 
     private HashMap<Material, ThrowableItem> throwables = new HashMap<Material, ThrowableItem>() {
@@ -23,6 +26,11 @@ public class Throwables extends Module {
             put(Material.NETHER_STAR, new StarfieldBomb());
         }
     };
+
+    @Override
+    public void onEnable() {
+        Killstreak.getModule_instance().addKillstreakReward(new StarfieldBomb.StarfieldBombReward());
+    }
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
@@ -43,7 +51,7 @@ public class Throwables extends Module {
             item.setPickupDelay(20 * 3600);
             item.setVelocity(player.getEyeLocation().getDirection().normalize().multiply(1.3));
 
-            throwables.get(holding.getType()).onCreate(item);
+            throwables.get(holding.getType()).onCreate(player, item);
         }
     }
 }

@@ -54,7 +54,7 @@ public class KitLoader extends Module {
             public void onCommand(CommandSender sender, String[] args) {
                 Player player = (Player) sender;
                 new KitInventoryBase(player, KitLoader.this, false).openInventory();
-                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&a&lKit GUI opened!"));
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&a&lKit selector opened!"));
             }
         });
 

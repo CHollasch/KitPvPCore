@@ -7,14 +7,14 @@ import net.minecraft.server.v1_7_R4.NBTTagString;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_7_R4.inventory.CraftItemStack;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Connor Hollasch
@@ -103,6 +103,32 @@ public class Common {
 		return setTag(item, tag);
 	}
 
+	public static ArrayList<ItemStack[]> makePages(ItemStack[] all, int max_per_page) {
+		ArrayList<ItemStack[]> pages = Lists.newArrayList();
+		if (all.length == 0) {
+			pages.add(new ItemStack[0]);
+			return pages;
+		}
+
+		ItemStack[] current = new ItemStack[max_per_page];
+
+		for (int i = 0, j = 0; i < all.length; i++, j++) {
+			if (i % max_per_page == 0 && i >= max_per_page) {
+				pages.add(current);
+				j = -1;
+				current = new ItemStack[max_per_page];
+				continue;
+			}
+
+			current[j] = all[i];
+		}
+
+		if (current[0] != null)
+			pages.add(current);
+
+		return pages;
+	}
+
 	public static List<String> getCustomMetadata(ItemStack item) {
 		if (!(item instanceof CraftItemStack)) {
 			item = CraftItemStack.asCraftCopy(item);
@@ -134,32 +160,6 @@ public class Common {
 			}
 		}
 		return null;
-	}
-
-	public static ArrayList<ItemStack[]> makePages(ItemStack[] all, int max_per_page) {
-		ArrayList<ItemStack[]> pages = Lists.newArrayList();
-		if (all.length == 0) {
-			pages.add(new ItemStack[0]);
-			return pages;
-		}
-
-		ItemStack[] current = new ItemStack[max_per_page];
-
-		for (int i = 0, j = 0; i < all.length; i++, j++) {
-			if (i % max_per_page == 0 && i >= max_per_page) {
-				pages.add(current);
-				j = -1;
-				current = new ItemStack[max_per_page];
-				continue;
-			}
-
-			current[j] = all[i];
-		}
-
-		if (current[0] != null)
-			pages.add(current);
-
-		return pages;
 	}
 
 	private static ItemStack setTag(ItemStack item, NBTTagCompound tag) {
@@ -210,5 +210,45 @@ public class Common {
 		String name = type.toString().replace("_", " ");
 		name = name.substring(0, 1) + name.substring(1).toLowerCase();
 		return name;
+	}
+
+	public static LinkedHashMap sortHashMapByValues(Map passedMap) {
+		List map_keys = new ArrayList<>(passedMap.keySet());
+		List map_values = new ArrayList<>(passedMap.values());
+
+		Collections.sort(map_values);
+
+		LinkedHashMap sorted_map = new LinkedHashMap();
+
+		Iterator values_iterator = map_values.iterator();
+		while (values_iterator.hasNext()) {
+			Object value = values_iterator.next();
+			Iterator key_iterator = map_keys.iterator();
+
+			while (key_iterator.hasNext()) {
+				Object key = key_iterator.next();
+
+				Object comp_passed_map = passedMap.get(key);
+				Object comp_direct_value = value;
+
+				if (comp_passed_map != null && comp_passed_map.equals(comp_direct_value))  {
+					passedMap.remove(key);
+					map_keys.remove(key);
+
+					sorted_map.put(key, value);
+					break;
+				}
+			}
+		}
+
+		return sorted_map;
+	}
+
+	public static void give(Player player, ItemStack itemStack) {
+		if (player.getInventory().firstEmpty() == -1) {
+			player.getWorld().dropItemNaturally(player.getEyeLocation(), itemStack);
+		} else {
+			player.getInventory().addItem(itemStack);
+		}
 	}
 }
