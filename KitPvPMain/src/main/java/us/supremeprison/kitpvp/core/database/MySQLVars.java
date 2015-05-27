@@ -14,13 +14,11 @@ public enum MySQLVars {
 
     CREATE_ATTACHMENT_TABLE("CREATE TABLE IF NOT EXISTS `%db%`.`user_attachments`(" +
             "`uuid` VARCHAR(36) NOT NULL, " +
-            "`attachment_label` VARCHAR(255) NOT NULL, " +
             "`attachment_data` TEXT NOT NULL, " +
-            "PRIMARY KEY (`uuid`, `attachment_label`));"),
-    REMOVE_ATTACHMENT("DELETE FROM `%db%`.`user_attachments` WHERE uuid=? AND attachment_label=?"),
-    GET_ALL_ATTACHMENTS("SELECT attachment_label, attachment_data FROM `%db%`.`user_attachments` WHERE uuid=?;"),
-    INSERT_INTO_ATTACHMENTS("INSERT INTO `%db%`.`user_attachments`(`uuid`, `attachment_label`, `attachment_data`) " +
-            "VALUES(?, ?, ?) " +
+            "PRIMARY KEY (`uuid`, `attachment_data`));"),
+    GET_ALL_ATTACHMENTS("SELECT attachment_data FROM `%db%`.`user_attachments` WHERE uuid=?;"),
+    INSERT_INTO_ATTACHMENTS("INSERT INTO `%db%`.`user_attachments`(`uuid`, `attachment_data`) " +
+            "VALUES(?, ?) " +
             "ON DUPLICATE KEY UPDATE attachment_data = VALUES(attachment_data);");
 
     private MySQLEnumWrapper wrapper;

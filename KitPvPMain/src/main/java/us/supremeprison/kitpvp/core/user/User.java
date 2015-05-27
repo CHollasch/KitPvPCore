@@ -1,6 +1,10 @@
 package us.supremeprison.kitpvp.core.user;
 
 import org.bukkit.ChatColor;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import us.supremeprison.kitpvp.core.KitPvP;
 import us.supremeprison.kitpvp.core.database.MySQLVars;
 import us.supremeprison.kitpvp.core.event.UserInitializeEvent;
@@ -83,21 +87,23 @@ public class User {
             public void run() {
                 try {
                     ResultSet all_attachment_data = MySQLVars.GET_ALL_ATTACHMENTS.getResultSet(player_uuid.toString());
-                    while (all_attachment_data.next()) {
-                        String label = all_attachment_data.getString("attachment_label");
-                        String data = all_attachment_data.getString("attachment_data");
-                        Attachment<?> attachment_model = attachments_manager.getAttachment(label);
-                        attachments.putDeserializedAttachment(label, attachment_model.deserialize(data));
+                    if (all_attachment_data.next()) {
+                        JSONParser parser = new JSONParser();
+                        try {
+                            JSONObject attachment = (JSONObject) parser.parse(all_attachment_data.getString("attachment_data"));
+                            for (Object rawKey : attachment.keySet()) {
+                                String key = rawKey.toString();
+                                Object value = attachment.get(key);
+                                Attachment<?> model = attachments_manager.getAttachment(key);
+                                attachments.putDeserializedAttachment(key, model.deserialize(value.toString()));
+                            }
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
                     }
 
-                    for (Attachment predefined_attachments : attachments_manager.getAllAttachments()) {
-                        if (attachments.isRegistered(predefined_attachments))
-                            continue;
+                    save(false);
 
-                        MySQLVars.INSERT_INTO_ATTACHMENTS.executeQuery(player_uuid.toString(),
-                                predefined_attachments.getAttachment_label(),
-                                predefined_attachments.serialize(predefined_attachments.getDefault_value()));
-                    }
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
@@ -124,15 +130,21 @@ public class User {
     }
 
     private void save() {
-        for (String attachment_label : attachments.protectedGetAllAttachments().keySet()) {
-            Object value = attachments.protectedGetAllAttachments().get(attachment_label);
-            Attachment matching = attachments_manager.getAttachment(attachment_label);
-            if (matching == null) {
-                MySQLVars.REMOVE_ATTACHMENT.executeQuery(player_uuid.toString(), attachment_label);
-            } else {
-                MySQLVars.INSERT_INTO_ATTACHMENTS.executeQuery(player_uuid.toString(), attachment_label, matching.serialize(value));
-            }
+        MySQLVars.INSERT_INTO_ATTACHMENTS.executeQuery(player_uuid.toString(),
+                buildAttachmentJSON().toJSONString());
+    }
+
+    private JSONObject buildAttachmentJSON() {
+        JSONObject object = new JSONObject();
+
+        for (Attachment attachment : attachments_manager.getAllAttachments()) {
+            String key = attachment.getAttachment_label();
+            Object value = attachments.isRegistered(attachment) ? attachments.getAttachment(attachment.getAttachment_label()) : attachment.getDefault_value();
+
+            object.put(key, value);
         }
+
+        return object;
     }
 
     private static class UserListener implements Listener {

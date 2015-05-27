@@ -2,9 +2,7 @@ package us.supremeprison.kitpvp.modules.Killstreak;
 
 import com.google.common.collect.Lists;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import us.supremeprison.kitpvp.core.command.CommandModule;
@@ -14,7 +12,6 @@ import us.supremeprison.kitpvp.core.module.modifiers.ModuleDependency;
 import us.supremeprison.kitpvp.core.user.User;
 import us.supremeprison.kitpvp.core.user.attachment.Attachment;
 import us.supremeprison.kitpvp.core.util.Common;
-import us.supremeprison.kitpvp.core.util.ReflectionHandler;
 
 import java.util.*;
 
