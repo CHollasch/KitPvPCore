@@ -82,8 +82,6 @@ public class StarfieldBomb extends ThrowableItem {
         schedule(delay, 20 * 2);
     }
 
-
-
     public static class StarfieldBombReward implements KillstreakReward {
         @Override
         public String getName() {

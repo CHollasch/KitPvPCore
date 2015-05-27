@@ -2,7 +2,9 @@ package us.supremeprison.kitpvp.modules.Killstreak;
 
 import com.google.common.collect.Lists;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import us.supremeprison.kitpvp.core.command.CommandModule;
@@ -41,6 +43,9 @@ public class Killstreak extends Module {
                 String compile = "";
 
                 for (KillstreakReward key : value) {
+                    if (key == null)
+                        continue;
+
                     compile += (key.getName() + ",");
                 }
 
