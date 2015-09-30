@@ -50,7 +50,7 @@ public class Economy extends Module {
         //Attach economy modules to players
         Attachment<Double> economy_attachment = new DoubleAttachment("economy", starting_balance);
         User.getAttachments_manager().put(economy_attachment);
-        parent_plugin.getServer().getPluginManager().registerEvents(new DeathMoney().setEcon(this), parent_plugin);
+        parent_plugin.getServer().getPluginManager().registerEvents(new DeathMoney(), parent_plugin);
 
         //Register economy command
         DynamicCommandRegistry.registerCommand(new CommandModule("eco", new String[]{"economy", "money", "bal", "balance", "ebal", "ebalance", "emoney"}, false) {

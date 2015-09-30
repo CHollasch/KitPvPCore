@@ -1,4 +1,4 @@
-package us.supremeprison.kitpvp.modules.CarePackage;
+package us.supremeprison.kitpvp.modules.SpaceCrate;
 
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import org.bukkit.*;

@@ -22,10 +22,7 @@ import java.util.UUID;
  * @author Connor Hollasch
  * @since 3/30/2015
  */
-@Todo("Fix money dropping (balance it)")
 public class DeathMoney implements Listener {
-
-    private Economy econ;
 
     @EventHandler
     public void onPlayerDeath(final PlayerDeathEvent event) {
@@ -61,10 +58,5 @@ public class DeathMoney implements Listener {
                 event.setCancelled(true);
             }
         }
-    }
-
-    public DeathMoney setEcon(Economy econ) {
-        this.econ = econ;
-        return this;
     }
 }
