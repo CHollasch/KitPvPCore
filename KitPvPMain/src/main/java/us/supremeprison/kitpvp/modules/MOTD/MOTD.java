@@ -1,12 +1,10 @@
 package us.supremeprison.kitpvp.modules.MOTD;
 
-import us.supremeprison.kitpvp.core.module.Module;
-import us.supremeprison.kitpvp.core.module.modifiers.ModuleDependency;
-import us.supremeprison.kitpvp.core.util.config.ConfigOption;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.server.ServerListPingEvent;
 import us.supremeprison.kitpvp.core.module.Module;
+import us.supremeprison.kitpvp.core.module.modifiers.ModuleDependency;
 import us.supremeprison.kitpvp.core.util.config.ConfigOption;
 
 import java.util.Arrays;

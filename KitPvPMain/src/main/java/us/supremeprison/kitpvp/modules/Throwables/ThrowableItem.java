@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 import us.supremeprison.kitpvp.core.KitPvP;
 
 import java.util.List;
@@ -13,11 +14,17 @@ import java.util.List;
  * @author Connor Hollasch
  * @since 3/18/2015
  */
-public abstract class ThrowableItem {
+public abstract class ThrowableItem implements Listener {
 
     protected String name;
 
-    public abstract void onCreate(Player player, Item item);
+    public ThrowableItem() {
+        Bukkit.getPluginManager().registerEvents(this, KitPvP.getPlugin_instance());
+    }
+
+    public abstract void onCreate(final Player player, final Item item);
+
+    public abstract boolean canCreate();
 
     public int schedule(Runnable runnable) {
         if (KitPvP.getPlugin_instance().isEnabled())

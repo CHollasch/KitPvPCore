@@ -22,4 +22,8 @@ public class EasyUserdata {
     public boolean contains(String label) {
         return userdata.containsKey(label.toLowerCase());
     }
+
+    public void remove(String label) {
+        userdata.remove(label);
+    }
 }

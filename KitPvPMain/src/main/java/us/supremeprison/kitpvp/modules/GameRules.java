@@ -1,9 +1,11 @@
 package us.supremeprison.kitpvp.modules;
 
+import org.bukkit.World;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.BlockPhysicsEvent;
 import us.supremeprison.kitpvp.core.module.Module;
 import us.supremeprison.kitpvp.core.module.modifiers.ModuleDependency;
 import us.supremeprison.kitpvp.core.util.config.ConfigOption;
-import org.bukkit.World;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,5 +33,10 @@ public class GameRules extends Module {
                 parent_plugin.logMessage(this, "Set game rule &d" + game_rule.split(":")[0] + "&e to &d" + game_rule.split(":")[1] + " &efor world &6" + world.getName());
             }
         }
+    }
+
+    @EventHandler
+    public void onBlockChange(BlockPhysicsEvent event) {
+        event.setCancelled(true);
     }
 }

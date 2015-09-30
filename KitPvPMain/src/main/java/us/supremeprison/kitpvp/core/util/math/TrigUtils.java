@@ -24,22 +24,22 @@ public class TrigUtils {
     public static int refAngleDegs(int angle) {
         if (angle < 0) {
             while (angle < 0)
-                angle+=360;
+                angle += 360;
         } else {
             while (angle > 360)
-                angle-=360;
+                angle -= 360;
         }
 
         if (angle == 0)
             return angle;
 
-        return angle-1;
+        return angle - 1;
     }
 
     public static Collection<Location> getPointsInCircle(Location origin, int radius, int points) {
         Collection<Location> values = new ArrayList<>();
 
-        for (int i = 0 ; i < 360 ; i+=(360 / points)) {
+        for (int i = 0; i < 360; i += (360 / points)) {
             double sin = SIN_VALUES[i];
             double cos = COS_VALUES[i];
             values.add(origin.clone().add(cos * radius, 0, sin * radius));

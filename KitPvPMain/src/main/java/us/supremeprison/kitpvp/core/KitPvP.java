@@ -1,6 +1,11 @@
 package us.supremeprison.kitpvp.core;
 
+import lombok.Getter;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.HandlerList;
+import org.bukkit.plugin.java.JavaPlugin;
 import us.supremeprison.kitpvp.core.command.CommandModule;
 import us.supremeprison.kitpvp.core.command.DynamicCommandRegistry;
 import us.supremeprison.kitpvp.core.database.MySQLConnectionPool;
@@ -16,15 +21,13 @@ import us.supremeprison.kitpvp.core.util.hologram.HologramManager;
 import us.supremeprison.kitpvp.core.util.inventory.InventoryListener;
 import us.supremeprison.kitpvp.core.util.inventory.OpenInventoryData;
 import us.supremeprison.kitpvp.core.util.messages.Form;
-import lombok.Getter;
-import net.minecraft.util.io.netty.util.internal.ConcurrentSet;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.event.HandlerList;
-import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author Connor Hollasch
@@ -73,7 +76,11 @@ public class KitPvP extends JavaPlugin {
         connection_pool = new MySQLConnectionPool(this, database_information);
         MySQLVars.CREATE_ATTACHMENT_TABLE.executeQuery();
 
-        try { reloadPluginModules(); } catch (Exception e) { e.printStackTrace(); }
+        try {
+            reloadPluginModules();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         printTodos();
 
@@ -94,6 +101,7 @@ public class KitPvP extends JavaPlugin {
         Form.insertTag("error", "&c&l(!) &7%msg%");
         Form.insertTag("rank", "&9&lRank&7: &e%msg%");
         Form.insertTag("eco", "&a&lEco&7: &e%msg%");
+        Form.insertTag("info", "&e&l(!) &7%msg%");
     }
 
     private void printTodos() {
@@ -162,13 +170,14 @@ public class KitPvP extends JavaPlugin {
         }
 
         List<Class<Module>> module_classes = ReflectionHandler.getClassesInPackage("us.supremeprison.kitpvp.modules", Module.class);
-        ConcurrentSet<Class<Module>> concurrent_modules = new ConcurrentSet<>();
+        CopyOnWriteArrayList<Class<Module>> concurrent_modules = new CopyOnWriteArrayList<>();
         concurrent_modules.addAll(module_classes);
         loadExcessModules(concurrent_modules);
     }
 
-    private void loadExcessModules(ConcurrentSet<Class<Module>> module_classes) throws Exception {
-        forClassModule: for (Class<? extends Module> module : module_classes) {
+    private void loadExcessModules(CopyOnWriteArrayList<Class<Module>> module_classes) throws Exception {
+        forClassModule:
+        for (Class<? extends Module> module : module_classes) {
             ModuleDependency dependencies = module.getAnnotation(ModuleDependency.class);
             if (dependencies != null) {
                 String[] all = dependencies.depends_on();
@@ -177,7 +186,8 @@ public class KitPvP extends JavaPlugin {
                         continue;
 
                     boolean found = false;
-                    forModule: for (Module loaded : this.modules) {
+                    forModule:
+                    for (Module loaded : this.modules) {
                         if (loaded.getModule_name().toLowerCase().equals(dependency.toLowerCase())) {
                             found = true;
                             break forModule;

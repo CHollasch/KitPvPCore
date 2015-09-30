@@ -1,5 +1,6 @@
 package us.supremeprison.kitpvp.core.util.config;
 
+import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemorySection;
@@ -8,8 +9,8 @@ import org.bukkit.plugin.Plugin;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Modified to work with KitPvPCore.
@@ -24,9 +25,13 @@ public class ClassConfig {
 
     private List<ConfigSerializable<?>> specials = new ArrayList<ConfigSerializable<?>>() {
         {
-            add(new LocationSerializer());
+            add(locationSerializer = new LocationSerializer());
+            add(new MaterialdataSeralizable());
         }
     };
+
+    @Getter
+    private static LocationSerializer locationSerializer;
 
     public void addConfigSerializer(ConfigSerializable<?> serializable) {
         specials.add(serializable);
@@ -48,7 +53,7 @@ public class ClassConfig {
             for (Field field : clazz.getDeclaredFields()) {
                 field.setAccessible(true);
 
-                ConfigOption option = field.getDeclaredAnnotation(ConfigOption.class);
+                ConfigOption option = field.getAnnotation(ConfigOption.class);
                 if (option == null)
                     continue;
 
@@ -57,7 +62,7 @@ public class ClassConfig {
                     boolean set = false;
                     Object find = wrapped_plugin.getConfig().get(section);
                     if (find instanceof MemorySection && field.get(class_container) instanceof HashMap) {
-                        Map<Object, Object> nMap = new HashMap<>();
+                        LinkedHashMap<Object, Object> nMap = new LinkedHashMap<>();
                         ConfigurationSection cfgSec = (ConfigurationSection) find;
                         for (String key : cfgSec.getKeys(false)) {
                             Object val = cfgSec.get(key);

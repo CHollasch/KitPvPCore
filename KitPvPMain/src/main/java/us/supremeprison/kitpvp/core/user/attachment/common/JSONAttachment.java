@@ -1,9 +1,9 @@
 package us.supremeprison.kitpvp.core.user.attachment.common;
 
-import us.supremeprison.kitpvp.core.user.attachment.Attachment;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import us.supremeprison.kitpvp.core.user.attachment.Attachment;
 
 /**
  * @author Connor Hollasch
@@ -28,8 +28,7 @@ public class JSONAttachment extends Attachment<JSONObject> {
 
             object = (JSONObject) parser.parse(in);
             return object;
-        }
-        catch (ParseException e) {
+        } catch (ParseException e) {
             e.printStackTrace();
         }
 

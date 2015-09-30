@@ -113,13 +113,13 @@ public class KitInventoryBase extends OpenInventoryData {
 
         for (int slot = 0; slot < inventory.getSize(); slot++) {
             if (inventory.getItem(slot) == null)
-                inventory.setItem(slot, Common.craftItem(Material.STAINED_GLASS_PANE, (byte)15, " "));
+                inventory.setItem(slot, Common.craftItem(Material.STAINED_GLASS_PANE, (byte) 15, " "));
         }
 
         if (!donor)
-            inventory.setItem(inventory.getSize()-1, Common.craftItem(Material.ARROW, "&a&lDonor kits&7..."));
+            inventory.setItem(inventory.getSize() - 1, Common.craftItem(Material.ARROW, "&a&lDonor kits&7..."));
         else
-            inventory.setItem(inventory.getSize()-9, Common.craftItem(Material.ARROW, "&7...&a&lRank kits"));
+            inventory.setItem(inventory.getSize() - 9, Common.craftItem(Material.ARROW, "&7...&a&lRank kits"));
 
         return inventory;
     }
@@ -160,7 +160,7 @@ public class KitInventoryBase extends OpenInventoryData {
             }
 
             if (Economy.getMoney(player) >= cost) {
-                Economy.setMoney(player, Economy.getMoney(player)-cost);
+                Economy.setMoney(player, Economy.getMoney(player) - cost);
                 player.sendMessage(ChatColor.GREEN + "Purchased a new kit!");
 
                 //Make sure to save in case of crash

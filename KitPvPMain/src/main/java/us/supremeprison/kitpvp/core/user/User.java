@@ -1,7 +1,16 @@
 package us.supremeprison.kitpvp.core.user;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.json.simple.JSONArray;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -10,16 +19,6 @@ import us.supremeprison.kitpvp.core.database.MySQLVars;
 import us.supremeprison.kitpvp.core.event.UserInitializeEvent;
 import us.supremeprison.kitpvp.core.user.attachment.Attachment;
 import us.supremeprison.kitpvp.core.user.attachment.AttachmentManager;
-import lombok.Getter;
-import lombok.Setter;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import us.supremeprison.kitpvp.core.user.attachment.EasyUserdata;
 
 import java.sql.ResultSet;
@@ -90,6 +89,7 @@ public class User {
                     if (all_attachment_data.next()) {
                         JSONParser parser = new JSONParser();
                         try {
+                            String attachmentData = all_attachment_data.getString("attachment_data");
                             JSONObject attachment = (JSONObject) parser.parse(all_attachment_data.getString("attachment_data"));
                             for (Object rawKey : attachment.keySet()) {
                                 String key = rawKey.toString();
@@ -139,7 +139,9 @@ public class User {
 
         for (Attachment attachment : attachments_manager.getAllAttachments()) {
             String key = attachment.getAttachment_label();
-            Object value = attachments.isRegistered(attachment) ? attachments.getAttachment(attachment.getAttachment_label()) : attachment.getDefault_value();
+            String value = attachments.isRegistered(attachment) ?
+                    attachment.serialize(attachments.getAttachment(attachment.getAttachment_label()))
+                    : attachment.serialize(attachment.getDefault_value());
 
             object.put(key, value);
         }

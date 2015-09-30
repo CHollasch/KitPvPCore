@@ -1,6 +1,7 @@
 package us.supremeprison.kitpvp.modules.DeathHandler;
 
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import us.supremeprison.kitpvp.core.util.Damager;
 
@@ -21,6 +22,9 @@ public class DamageSet {
     private double damaged = 0.0;
 
     public void addDamage(Damager damager) {
+        if (damager == null)
+            return;
+
         //Max of 20 recent damage causes
         try {
             if (all_dealt_damage.size() >= 15) {
@@ -50,7 +54,7 @@ public class DamageSet {
             if (next.getDamager() == null)
                 continue;
 
-            return next.getDamager();
+            return Bukkit.getPlayer(next.getDamager());
         }
         return null;
     }
@@ -82,10 +86,9 @@ public class DamageSet {
                 double total = assists.remove(next.getDamager());
                 total += next.getDamage();
 
-                assists.put(next.getDamager(), total);
-            }
-            else
-                assists.put(next.getDamager(), next.getDamage());
+                assists.put(Bukkit.getPlayer(next.getDamager()), total);
+            } else
+                assists.put(Bukkit.getPlayer(next.getDamager()), next.getDamage());
         }
 
         return assists;

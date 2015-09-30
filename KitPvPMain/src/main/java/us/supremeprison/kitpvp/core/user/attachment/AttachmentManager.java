@@ -15,7 +15,7 @@ public class AttachmentManager {
 
     public void put(Attachment<?> attachment) {
         user_attachments.put(attachment.getAttachment_label().toLowerCase(), attachment);
-        KitPvP.getPlugin_instance().logMessage("New attachment (&d" + attachment.getDefault_value().getClass().getTypeName() + ", " + attachment.getAttachment_label() + "&e) registered!");
+        KitPvP.getPlugin_instance().logMessage("New attachment (&d" + attachment.getDefault_value().getClass().getName() + ", " + attachment.getAttachment_label() + "&e) registered!");
     }
 
     public Collection<Attachment<?>> getAllAttachments() {

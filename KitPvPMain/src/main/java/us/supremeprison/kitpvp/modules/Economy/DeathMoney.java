@@ -1,8 +1,6 @@
 package us.supremeprison.kitpvp.modules.Economy;
 
-import lombok.Setter;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Item;
@@ -16,6 +14,7 @@ import us.supremeprison.kitpvp.core.KitPvP;
 import us.supremeprison.kitpvp.core.user.User;
 import us.supremeprison.kitpvp.core.util.Common;
 import us.supremeprison.kitpvp.core.util.ParticleEffect;
+import us.supremeprison.kitpvp.core.util.Todo;
 
 import java.util.UUID;
 
@@ -23,6 +22,7 @@ import java.util.UUID;
  * @author Connor Hollasch
  * @since 3/30/2015
  */
+@Todo("Fix money dropping (balance it)")
 public class DeathMoney implements Listener {
 
     private Economy econ;
@@ -57,7 +57,7 @@ public class DeathMoney implements Listener {
                 Economy.setMoney(player, Economy.getMoney(player) + value);
                 player.playSound(player.getLocation(), Sound.ORB_PICKUP, 1, (float) (Math.random() * 2));
                 event.getItem().remove();
-                ParticleEffect.INSTANT_SPELL.display(event.getItem().getLocation(), 0.02f, 0.02f, 0.02f, 0f, 5);
+                ParticleEffect.SPELL_INSTANT.display(0.02f, 0.02f, 0.02f, 0f, 5, event.getItem().getLocation());
                 event.setCancelled(true);
             }
         }

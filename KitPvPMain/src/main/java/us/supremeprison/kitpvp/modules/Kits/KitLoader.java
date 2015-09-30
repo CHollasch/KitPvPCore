@@ -5,7 +5,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import us.supremeprison.kitpvp.core.KitPvP;
 import us.supremeprison.kitpvp.core.command.CommandModule;
 import us.supremeprison.kitpvp.core.command.DynamicCommandRegistry;
 import us.supremeprison.kitpvp.core.module.Module;
@@ -19,7 +18,9 @@ import us.supremeprison.kitpvp.core.util.config.ConfigOption;
 import us.supremeprison.kitpvp.modules.Kits.inventory.KitInventoryBase;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 /**
  * @author Connor Hollasch

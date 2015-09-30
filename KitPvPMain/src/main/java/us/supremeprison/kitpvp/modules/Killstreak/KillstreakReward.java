@@ -16,4 +16,6 @@ public interface KillstreakReward {
     public int getKills();
 
     public void giveToPlayer(Player player);
+
+    public String getDescription();
 }

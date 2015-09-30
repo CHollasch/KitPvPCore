@@ -1,9 +1,12 @@
 package us.supremeprison.kitpvp.core.util;
 
-import org.bukkit.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 import org.bukkit.FireworkEffect.Builder;
-import org.bukkit.craftbukkit.libs.com.google.gson.Gson;
-import org.bukkit.craftbukkit.libs.com.google.gson.GsonBuilder;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
@@ -28,7 +31,7 @@ public class KitSerializer {
 
     private static final JSONParser parser = new JSONParser();
 
-    public static ItemStack[][] createKitArmorAndContents(File schematic){
+    public static ItemStack[][] createKitArmorAndContents(File schematic) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(schematic));
             String contents = "";
@@ -96,7 +99,7 @@ public class KitSerializer {
     public static ItemStack[] jsonToInventory(String string) throws ParseException {
         JSONObject root_object = (JSONObject) parser.parse(string);
 
-        ItemStack[] inventory = new ItemStack[(int) ((long)root_object.get("size"))];
+        ItemStack[] inventory = new ItemStack[(int) ((long) root_object.get("size"))];
 
         JSONArray items_array = (JSONArray) root_object.get("items");
         for (int i = 0; i < items_array.size(); i++) {

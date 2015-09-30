@@ -5,7 +5,10 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerToggleFlightEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.util.Vector;
 import us.supremeprison.kitpvp.core.module.Module;
@@ -47,7 +50,7 @@ public class NanoSuit extends Module {
                 }
             }
         };
-        scheduleAsync(update, 5, 5);
+        schedule(update, 5, 5);
     }
 
     @Override
@@ -102,7 +105,7 @@ public class NanoSuit extends Module {
             applicable_for_forwards_fling.remove(event.getPlayer().getName());
             event.getPlayer().setVelocity(event.getPlayer().getEyeLocation().getDirection().normalize().add(new Vector(0, upwards_fling, 0)).multiply(forward_fling));
             event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.IRONGOLEM_THROW, 1, 1);
-            ParticleEffect.CLOUD.display(event.getPlayer().getLocation(), 0.2f, 0f, 0.2f, 0.06f, 30);
+            ParticleEffect.CLOUD.display(0.2f, 0f, 0.2f, 0.06f, 30, event.getPlayer().getLocation());
         }
     }
 
@@ -133,7 +136,7 @@ public class NanoSuit extends Module {
                         event.getPlayer().setAllowFlight(false);
                     }
                 }, 1);
-                ParticleEffect.CLOUD.display(event.getPlayer().getLocation(), 0.2f, 0f, 0.2f, 0.06f, 30);
+                ParticleEffect.CLOUD.display(0.2f, 0f, 0.2f, 0.06f, 30, event.getPlayer().getLocation());
             } else {
                 event.getPlayer().setFlying(false);
                 event.getPlayer().setAllowFlight(false);

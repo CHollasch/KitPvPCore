@@ -1,14 +1,12 @@
 package us.supremeprison.kitpvp.core.util;
 
-import org.bukkit.entity.Player;
-
 /**
  * @author Connor Hollasch
  * @since 3/17/2015
  */
 public interface Damager {
 
-    public Player getDamager();
+    public String getDamager();
 
     public double getDamage();
 
@@ -16,10 +14,10 @@ public interface Damager {
 
     public class Util {
 
-        public static Damager createNewDamageEvenet(final Player damager, final double damage, final String description) {
+        public static Damager createNewDamageEvenet(final String damager, final double damage, final String description) {
             final Damager damager_event = new Damager() {
                 @Override
-                public Player getDamager() {
+                public String getDamager() {
                     return damager;
                 }
 
@@ -38,7 +36,7 @@ public interface Damager {
                     if (damager == null)
                         return damage + " dealt (" + description + ")";
 
-                    return damager.getName() + " dealt " + damage + " damage (" + description + ")";
+                    return damager + " dealt " + damage + " damage (" + description + ")";
                 }
             };
             return damager_event;

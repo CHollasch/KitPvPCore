@@ -1,15 +1,11 @@
 package us.supremeprison.kitpvp.modules.DeathHandler;
 
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import us.supremeprison.kitpvp.core.module.Module;
 import us.supremeprison.kitpvp.core.module.modifiers.Immutable;
 import us.supremeprison.kitpvp.core.module.modifiers.ModuleDependency;
 import us.supremeprison.kitpvp.core.util.config.ConfigOption;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * @author Connor Hollasch

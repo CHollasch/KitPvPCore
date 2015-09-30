@@ -1,6 +1,12 @@
 package us.supremeprison.kitpvp.modules.Rank;
 
 import lombok.Getter;
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import us.supremeprison.kitpvp.core.command.CommandModule;
 import us.supremeprison.kitpvp.core.command.DynamicCommandRegistry;
 import us.supremeprison.kitpvp.core.module.Module;
@@ -12,12 +18,6 @@ import us.supremeprison.kitpvp.core.util.config.ConfigOption;
 import us.supremeprison.kitpvp.core.util.messages.Form;
 import us.supremeprison.kitpvp.modules.Economy.Economy;
 import us.supremeprison.kitpvp.modules.Stats.Stats;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.text.DecimalFormat;
 

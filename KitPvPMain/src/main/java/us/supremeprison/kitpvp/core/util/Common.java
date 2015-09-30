@@ -1,20 +1,16 @@
 package us.supremeprison.kitpvp.core.util;
 
 import com.google.common.collect.Lists;
-import net.minecraft.server.v1_7_R4.NBTTagCompound;
-import net.minecraft.server.v1_7_R4.NBTTagList;
-import net.minecraft.server.v1_7_R4.NBTTagString;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_7_R4.inventory.CraftItemStack;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.lang.reflect.Field;
 import java.util.*;
+
+;
 
 /**
  * @author Connor Hollasch
@@ -22,233 +18,158 @@ import java.util.*;
  */
 public class Common {
 
-	public static String center(String input) {
-		int max_trim = 34;
-		for (char c : input.toCharArray()) {
-			if (c == '&')
-				max_trim+=2;
-		}
+    public static String center(String input) {
+        int max_trim = 34;
+        for (char c : input.toCharArray()) {
+            if (c == '&')
+                max_trim += 2;
+        }
 
-		int pad = (max_trim - input.length()) / 2;
-		for (int x = 0; x < pad; x++)
-			input = (" " + input);
+        int pad = (max_trim - input.length()) / 2;
+        for (int x = 0; x < pad; x++)
+            input = (" " + input);
 
-		return input;
-	}
+        return input;
+    }
 
-	public static String trimTitle(String input) {
-		return (input.length() > 32 ? input.substring(0, 32) : input);
-	}
+    public static String trimTitle(String input) {
+        return (input.length() > 32 ? input.substring(0, 32) : input);
+    }
 
-	public static ItemStack craftItem(Material type, int amount, byte data, String name, String... lore) {
-		ItemStack stack = new ItemStack(type, amount, (short) 0, data);
-		ItemMeta meta = stack.getItemMeta();
-		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
-		List<String> translated = Lists.newArrayList();
-		for (String raw : lore) {
-			translated.add(ChatColor.translateAlternateColorCodes('&', raw));
-		}
-		meta.setLore(translated);
-		stack.setItemMeta(meta);
-		return stack;
-	}
+    public static ItemStack craftItem(Material type, int amount, byte data, String name, String... lore) {
+        ItemStack stack = new ItemStack(type, amount, (short) 0, data);
+        ItemMeta meta = stack.getItemMeta();
+        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
+        List<String> translated = Lists.newArrayList();
+        for (String raw : lore) {
+            translated.add(ChatColor.translateAlternateColorCodes('&', raw));
+        }
+        meta.setLore(translated);
+        stack.setItemMeta(meta);
+        return stack;
+    }
 
-	public static ItemStack craftItem(Material type, int amount, String name, String... lore) {
-		return craftItem(type, amount, (byte) 0, name, lore);
-	}
+    public static ItemStack craftItem(Material type, int amount, String name, String... lore) {
+        return craftItem(type, amount, (byte) 0, name, lore);
+    }
 
-	public static ItemStack craftItem(Material type, byte data, String name, String... lore) {
-		return craftItem(type, 1, data, name, lore);
-	}
+    public static ItemStack craftItem(Material type, byte data, String name, String... lore) {
+        return craftItem(type, 1, data, name, lore);
+    }
 
-	public static ItemStack craftItem(Material type, short data, String name, boolean _unused) {
-		ItemStack stack = new ItemStack(type, 1, data, (byte) 0);
-		ItemMeta meta = stack.getItemMeta();
-		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
-		stack.setItemMeta(meta);
-		return stack;
-	}
+    public static ItemStack craftItem(Material type, short data, String name, boolean _unused) {
+        ItemStack stack = new ItemStack(type, 1, data, (byte) 0);
+        ItemMeta meta = stack.getItemMeta();
+        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
+        stack.setItemMeta(meta);
+        return stack;
+    }
 
-	public static ItemStack craftItem(Material type, String name, String... lore) {
-		return craftItem(type, 1, name, lore);
-	}
+    public static ItemStack craftItem(Material type, String name, String... lore) {
+        return craftItem(type, 1, name, lore);
+    }
 
-	public static void removeOneInHand(Player player) {
-		ItemStack inHand = player.getItemInHand();
-		if (inHand.getAmount() == 1)
-			player.setItemInHand(null);
-		else {
-			inHand.setAmount(inHand.getAmount()-1);
-			player.setItemInHand(inHand);
-		}
-	}
+    public static void removeOneInHand(Player player) {
+        ItemStack inHand = player.getItemInHand();
+        if (inHand.getAmount() == 1)
+            player.setItemInHand(null);
+        else {
+            inHand.setAmount(inHand.getAmount() - 1);
+            player.setItemInHand(inHand);
+        }
+    }
 
-	public static ItemStack addCustomMetadata(ItemStack item, List<String> nbt_data) {
-		if (!(item instanceof CraftItemStack)) {
-			item = CraftItemStack.asCraftCopy(item);
-		}
+    public static boolean empty(Inventory inventory) {
+        ItemStack[] items = inventory.getContents();
 
-		NBTTagCompound tag = getTag(item);
-		if (tag == null) {
-			tag = new NBTTagCompound();
-		}
+        for (int i = 0; i < items.length; i++) {
+            if (items[i] != null && !items[i].getType().equals(Material.AIR))
+                return false;
+        }
 
-		NBTTagList tag_list = new NBTTagList();
-		for (String nbt : nbt_data) {
-			tag_list.add(new NBTTagString(nbt));
-		}
+        return true;
+    }
 
-		tag.set("custom_metadata", tag_list);
+    public static String namify(Material type) {
+        if (type.equals(Material.AIR))
+            return "Hand";
 
-		return setTag(item, tag);
-	}
+        StringBuilder sb = new StringBuilder();
+        String[] parts = type.toString().toLowerCase().split("_");
 
-	public static ArrayList<ItemStack[]> makePages(ItemStack[] all, int max_per_page) {
-		ArrayList<ItemStack[]> pages = Lists.newArrayList();
-		if (all.length == 0) {
-			pages.add(new ItemStack[0]);
-			return pages;
-		}
+        for (String part : parts) {
+            sb.append(part.substring(0, 1).toUpperCase() + part.substring(1).toLowerCase());
+            sb.append(" ");
+        }
 
-		ItemStack[] current = new ItemStack[max_per_page];
+        if (sb.toString().endsWith(" "))
+            return sb.toString().substring(0, sb.length() - 1);
 
-		for (int i = 0, j = 0; i < all.length; i++, j++) {
-			if (i % max_per_page == 0 && i >= max_per_page) {
-				pages.add(current);
-				j = -1;
-				current = new ItemStack[max_per_page];
-				continue;
-			}
+        return sb.toString();
+    }
 
-			current[j] = all[i];
-		}
+    public static <T> void arrayModifier(T[] array, ArrayModifier<T> modifier) {
+        for (int i = 0; i < array.length; i++) {
+            T pos = array[i];
+            array[i] = modifier.changeAtIndex(pos, i);
+        }
+    }
 
-		if (current[0] != null)
-			pages.add(current);
+    public static interface ArrayModifier<T> {
+        public T changeAtIndex(T at, int index);
+    }
 
-		return pages;
-	}
+    public static LinkedHashMap sortHashMapByValues(Map passedMap) {
+        List map_keys = new ArrayList<>(passedMap.keySet());
+        List map_values = new ArrayList<>(passedMap.values());
 
-	public static List<String> getCustomMetadata(ItemStack item) {
-		if (!(item instanceof CraftItemStack)) {
-			item = CraftItemStack.asCraftCopy(item);
-		}
-		NBTTagCompound tag = getTag(item);
-		if (tag == null) {
-			tag = new NBTTagCompound();
-		}
+        if (hasNull(map_values)) {
+            return new LinkedHashMap();
+        }
 
-		List<String> custom_metadata = new ArrayList<>();
+        Collections.sort(map_values);
 
-		if (tag.hasKey("custom_metadata")) {
-			NBTTagList custom_metadata_list = (NBTTagList) tag.get("custom_metadata");
+        LinkedHashMap sorted_map = new LinkedHashMap();
 
-			for (int i = 0; i < custom_metadata_list.size(); i++) {
-				custom_metadata.add(custom_metadata_list.getString(i));
-			}
-		}
-		return custom_metadata;
-	}
+        Iterator values_iterator = map_values.iterator();
+        while (values_iterator.hasNext()) {
+            Object value = values_iterator.next();
+            Iterator key_iterator = map_keys.iterator();
 
-	private static NBTTagCompound getTag(ItemStack item) {
-		if (item instanceof CraftItemStack) {
-			try {
-				Field field = CraftItemStack.class.getDeclaredField("handle");
-				field.setAccessible(true);
-				return ((net.minecraft.server.v1_7_R4.ItemStack) field.get(item)).tag;
-			} catch (Exception e) {
-			}
-		}
-		return null;
-	}
+            while (key_iterator.hasNext()) {
+                Object key = key_iterator.next();
 
-	private static ItemStack setTag(ItemStack item, NBTTagCompound tag) {
-		CraftItemStack craftItem = null;
-		if (item instanceof CraftItemStack) {
-			craftItem = (CraftItemStack) item;
-		} else {
-			craftItem = CraftItemStack.asCraftCopy(item);
-		}
+                Object comp_passed_map = passedMap.get(key);
+                Object comp_direct_value = value;
 
-		net.minecraft.server.v1_7_R4.ItemStack nmsItem = null;
-		try {
-			Field field = CraftItemStack.class.getDeclaredField("handle");
-			field.setAccessible(true);
-			nmsItem = ((net.minecraft.server.v1_7_R4.ItemStack) field.get(item));
-		} catch (Exception e) {
-		}
-		if (nmsItem == null) {
-			nmsItem = CraftItemStack.asNMSCopy(craftItem);
-		}
+                if (comp_passed_map != null && comp_passed_map.equals(comp_direct_value)) {
+                    passedMap.remove(key);
+                    map_keys.remove(key);
 
-		nmsItem.tag = tag;
-		try {
-			Field field = CraftItemStack.class.getDeclaredField("handle");
-			field.setAccessible(true);
-			field.set(craftItem, nmsItem);
-		} catch (Exception e) {
-		}
+                    sorted_map.put(key, value);
+                    break;
+                }
+            }
+        }
 
-		return craftItem;
-	}
+        return sorted_map;
+    }
 
-	public static boolean empty(Inventory inventory) {
-		ItemStack[] items = inventory.getContents();
+    private static boolean hasNull(Collection stuff) {
+        for (Object o : stuff) {
+            if (o == null) {
+                return true;
+            }
+        }
 
-		for (int i = 0; i < items.length; i++) {
-			if (items[i] != null && !items[i].getType().equals(Material.AIR))
-				return false;
-		}
+        return false;
+    }
 
-		return true;
-	}
-
-	public static String namify(Material type) {
-		if (type.equals(Material.AIR))
-			return "Hand";
-
-		String name = type.toString().replace("_", " ");
-		name = name.substring(0, 1) + name.substring(1).toLowerCase();
-		return name;
-	}
-
-	public static LinkedHashMap sortHashMapByValues(Map passedMap) {
-		List map_keys = new ArrayList<>(passedMap.keySet());
-		List map_values = new ArrayList<>(passedMap.values());
-
-		Collections.sort(map_values);
-
-		LinkedHashMap sorted_map = new LinkedHashMap();
-
-		Iterator values_iterator = map_values.iterator();
-		while (values_iterator.hasNext()) {
-			Object value = values_iterator.next();
-			Iterator key_iterator = map_keys.iterator();
-
-			while (key_iterator.hasNext()) {
-				Object key = key_iterator.next();
-
-				Object comp_passed_map = passedMap.get(key);
-				Object comp_direct_value = value;
-
-				if (comp_passed_map != null && comp_passed_map.equals(comp_direct_value))  {
-					passedMap.remove(key);
-					map_keys.remove(key);
-
-					sorted_map.put(key, value);
-					break;
-				}
-			}
-		}
-
-		return sorted_map;
-	}
-
-	public static void give(Player player, ItemStack itemStack) {
-		if (player.getInventory().firstEmpty() == -1) {
-			player.getWorld().dropItemNaturally(player.getEyeLocation(), itemStack);
-		} else {
-			player.getInventory().addItem(itemStack);
-		}
-	}
+    public static void give(Player player, ItemStack itemStack) {
+        if (player.getInventory().firstEmpty() == -1) {
+            player.getWorld().dropItemNaturally(player.getEyeLocation(), itemStack);
+        } else {
+            player.getInventory().addItem(itemStack);
+        }
+    }
 }

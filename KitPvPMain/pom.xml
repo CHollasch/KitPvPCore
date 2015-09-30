@@ -11,5 +11,22 @@
 
     <artifactId>KitPvPMain</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>bukkit</artifactId>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../lib/spigot.jar</systemPath>
+            <version>1.8</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.filoghost</groupId>
+            <artifactId>holo-displays</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../lib/HolographicDisplays.jar</systemPath>
+        </dependency>
+    </dependencies>
 
 </project>

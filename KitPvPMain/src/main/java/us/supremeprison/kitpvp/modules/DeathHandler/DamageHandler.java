@@ -2,7 +2,6 @@ package us.supremeprison.kitpvp.modules.DeathHandler;
 
 import com.google.common.collect.Lists;
 import mkremins.fanciful.FancyMessage;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -53,7 +52,7 @@ public class DamageHandler implements Listener {
         if (damager instanceof Player) {
             //Direct player attacking another player
             Player attacker = (Player) damager;
-            damage_evnet = createNewDamageEvenet(attacker, event.getDamage(), "Attacked with " + Common.namify(attacker.getItemInHand().getType()));
+            damage_evnet = createNewDamageEvenet(attacker.getName(), event.getDamage(), "Attacked with " + Common.namify(attacker.getItemInHand().getType()));
         } else if (damager instanceof Projectile) {
             //Indirect shot projectile damaging player
             Projectile projectile = (Projectile) damager;
@@ -61,9 +60,9 @@ public class DamageHandler implements Listener {
                 return;
 
             Player shooter = (Player) projectile.getShooter();
-            damage_evnet = createNewDamageEvenet(shooter, event.getDamage(), "Shot with an " + projectile.getType().getName());
+            damage_evnet = createNewDamageEvenet(shooter.getName(), event.getDamage(), "Shot with an " + projectile.getType().getName());
         } else if (damager instanceof LightningStrike) {
-            damage_evnet = create(damaged, event.getDamage(), "Lightning");
+            damage_evnet = create(damaged.getName(), event.getDamage(), "Lightning");
         }
 
         if (!damaged_user.getUserdata().contains(DAMAGE_META_TAG)) {
@@ -148,7 +147,7 @@ public class DamageHandler implements Listener {
             //Spiral arrows!
             final Location start = died.getEyeLocation().clone().add(0.5, 0, 0.5);
 
-            for (int i = 0; i < 360; i+=10) {
+            for (int i = 0; i < 360; i += 10) {
                 final int x = i;
                 final double _x = Math.toRadians(x);
                 Bukkit.getScheduler().scheduleSyncDelayedTask(KitPvP.getPlugin_instance(), new Runnable() {
@@ -161,7 +160,7 @@ public class DamageHandler implements Listener {
                         arrow.setShooter(died);
                         arrow.setVelocity(new Vector(cos, 0.3, sin).normalize().divide(new Vector(2, 1, 2)));
                     }
-                }, i/10);
+                }, i / 10);
             }
         }
 
@@ -189,9 +188,10 @@ public class DamageHandler implements Listener {
         if (assistors.size() != 0) {
             death_tooltip.add(translateAlternateColorCodes('&', " &a&lAssistors&7:"));
             for (Player key : assistors.keySet()) {
+                String keyName = (key == null ? "Environment" : key.getName());
                 Double value = assistors.get(key);
                 death_tooltip.add(translateAlternateColorCodes('&',
-                        "  &a&l" + (++index) + "&7.  &f" + key.getName() + " &7(&c" + value + " damage&7)"));
+                        "  &a&l" + (++index) + "&7.  &f" + keyName + " &7(&c" + value + " damage&7)"));
             }
             death_tooltip.add("");
         }
@@ -199,7 +199,7 @@ public class DamageHandler implements Listener {
         index = 0;
         for (Damager damaged : ds.getAllDamageCauses()) {
             death_tooltip.add(translateAlternateColorCodes('&', "  &a&l" + (++index) + "&7. &7(&c" +
-                    (damaged.getDamager() == null || damaged.getDamager().equals(died) ? "Yourself" : damaged.getDamager().getName())
+                    (damaged.getDamager() == null || damaged.getDamager().equals(died) ? "Yourself" : damaged.getDamager())
                     + "&7) &f» &7(&c" + damaged.getDamage() + " damage&7) &f» &7(&c" + damaged.getDescription() + "&7)"));
         }
         death_tooltip.add("");
@@ -238,24 +238,36 @@ public class DamageHandler implements Listener {
         Stats.addKills(killer.getPlayer(), 1);
     }
 
-    private Damager fromCause(Player yourself, EntityDamageEvent.DamageCause cause, double damage) {
+    private Damager fromCause(Player player, EntityDamageEvent.DamageCause cause, double damage) {
+        String yourself = player.getName();
         switch (cause) {
-            case DROWNING: return create(yourself, damage, "Drowning");
-            case FALL: return create(yourself, damage, "Falling");
+            case DROWNING:
+                return create(yourself, damage, "Drowning");
+            case FALL:
+                return create("World", damage, "Falling");
             case FIRE_TICK:
-            case FIRE: return create(yourself, damage, "Fire");
-            case LAVA: return create(yourself, damage, "Lava");
-            case BLOCK_EXPLOSION: return create(yourself, damage, "Explosion");
-            case STARVATION: return create(yourself, damage, "Starvation");
-            case SUFFOCATION: return create(yourself, damage, "Suffocation");
-            case SUICIDE: return create(yourself, yourself.getHealth(), "Suicide :o");
-            case THORNS: return create(yourself, damage, "Thorns");
-            case CONTACT: return create(yourself, damage, "Cactus");
-            default: return null;
+            case FIRE:
+                return create("World", damage, "Fire");
+            case LAVA:
+                return create("World", damage, "Lava");
+            case BLOCK_EXPLOSION:
+                return create("World", damage, "Explosion");
+            case STARVATION:
+                return create(yourself, damage, "Starvation");
+            case SUFFOCATION:
+                return create("World", damage, "Suffocation");
+            case SUICIDE:
+                return create(yourself, player.getHealth(), "Suicide :o");
+            case THORNS:
+                return create(yourself, damage, "Thorns");
+            case CONTACT:
+                return create(yourself, damage, "Cactus");
+            default:
+                return null;
         }
     }
 
-    private static Damager create(Player player, double damage, String desc) {
+    private static Damager create(String player, double damage, String desc) {
         return Damager.Util.createNewDamageEvenet(player, damage, desc);
     }
 }

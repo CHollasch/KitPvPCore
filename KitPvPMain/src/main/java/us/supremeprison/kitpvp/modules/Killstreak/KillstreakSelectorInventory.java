@@ -25,6 +25,8 @@ public class KillstreakSelectorInventory extends OpenInventoryData {
 
     private Killstreak module;
 
+    private HashMap<Integer, KillstreakReward> inventoryRewards = new HashMap<>();
+
     public KillstreakSelectorInventory(Player player) {
         super(player);
         module = Killstreak.getModule_instance();
@@ -32,7 +34,9 @@ public class KillstreakSelectorInventory extends OpenInventoryData {
 
     public Inventory createInventory() {
         Inventory inventory = Bukkit.createInventory(null, 54, Common.center(ChatColor.translateAlternateColorCodes('&', " &8Killstreak Rewards")));
-        for (int i = 0; i < 9; i++) {
+        int i = 0;
+
+        for (; i < 9; i++) {
             inventory.setItem(i, Common.craftItem(Material.STAINED_GLASS_PANE, (byte) 15, " "));
         }
 
@@ -46,7 +50,7 @@ public class KillstreakSelectorInventory extends OpenInventoryData {
         inventory.setItem(10, center_items[1]);
         inventory.setItem(11, center_items[2]);
 
-        int i = 12;
+        i = 12;
 
         LinkedHashMap<KillstreakReward, Integer> killstreakRewards = Common.sortHashMapByValues(Killstreak.getModule_instance().getPlayer_killstreak_rewards(player));
         for (KillstreakReward key : killstreakRewards.keySet()) {
@@ -61,13 +65,14 @@ public class KillstreakSelectorInventory extends OpenInventoryData {
 
         i = 18;
 
-        for (;i < 27; i++) {
+        for (; i < 27; i++) {
             inventory.setItem(i, Common.craftItem(Material.STAINED_GLASS_PANE, (byte) 15, " "));
         }
 
         for (KillstreakReward reward : Killstreak.getModule_instance().getKillstreak_rewards_sorted().keySet()) {
             int kills = reward.getKills();
             inventory.setItem(i, getTaggedStack(reward, kills));
+            inventoryRewards.put(i, reward);
             i++;
         }
 
@@ -86,6 +91,57 @@ public class KillstreakSelectorInventory extends OpenInventoryData {
 
     @Override
     public void onClick(InventoryClickEvent event) {
+        if (event.getRawSlot() >= event.getInventory().getSize())
+            return;
+
         event.setCancelled(true);
+        int slot = event.getSlot();
+
+        if (slot >= 27) {
+            KillstreakReward reward = inventoryRewards.get(slot);
+
+            if (reward == null) {
+                return;
+            }
+
+            User user = User.fromPlayer(player);
+            List<KillstreakReward> current = user.getAttachments().getAttachment(Killstreak.KS_REWARD_ATTACHMENT);
+
+            if (current.contains(reward)) {
+                return;
+            }
+
+            if (current.size() >= 3) {
+                KillstreakReward replace = null;
+
+                for (KillstreakReward find : current) {
+                    if (current == null) {
+                        continue;
+                    }
+
+                    if (replace == null) {
+                        replace = find;
+                        continue;
+                    }
+
+                    if (find.getKills() <= reward.getKills() && replace.getKills() >= find.getKills()) {
+                        replace = find;
+                        continue;
+                    }
+                }
+
+                if (replace != null) {
+                    current.remove(replace);
+                }
+            }
+
+            current.add(reward);
+
+            user.getAttachments().changeAttachment(Killstreak.KS_REWARD_ATTACHMENT, current);
+            user.save(false);
+
+            closeInventory();
+            openInventory();
+        }
     }
 }

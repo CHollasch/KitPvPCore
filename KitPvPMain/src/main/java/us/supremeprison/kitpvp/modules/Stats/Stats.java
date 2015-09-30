@@ -70,6 +70,6 @@ public class Stats extends Module {
         int kills = getKills(player);
         int deaths = getDeaths(player);
 
-        return (deaths == 0 ? (kills == 0 ? 1 : 0) : (double)kills/(double)deaths);
+        return (deaths == 0 ? (kills == 0 ? 1 : 0) : (double) kills / (double) deaths);
     }
 }

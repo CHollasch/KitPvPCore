@@ -19,30 +19,24 @@ public class MySQLConnectionPool {
 
     private int last_used_connection = -1;
 
-    public MySQLConnectionPool(KitPvP plugin_instance, MySQLDatabaseInformation database_information)
-    {
+    public MySQLConnectionPool(KitPvP plugin_instance, MySQLDatabaseInformation database_information) {
         this.plugin_instance = plugin_instance;
         this.connections = Lists.newArrayList();
         this.database_information = database_information;
 
-        try
-        {
+        try {
             Class.forName("com.mysql.jdbc.Driver");
-        } catch (Exception exception)
-        {
+        } catch (Exception exception) {
             plugin_instance.logMessage("MySQLConnectionPool: &cDrivers not found.");
             exception.printStackTrace();
             return;
         }
 
         plugin_instance.logMessage("MySQLConnectionPool: &aOpening &e" + database_information.getConnection_count() + "&a connections.");
-        for (int i = 0; i < database_information.getConnection_count(); i++)
-        {
-            try
-            {
+        for (int i = 0; i < database_information.getConnection_count(); i++) {
+            try {
                 connections.add(DriverManager.getConnection(database_information.buildURL(), database_information.getUsername(), database_information.getPassword()));
-            } catch (Exception exception)
-            {
+            } catch (Exception exception) {
                 plugin_instance.logMessage("MySQLConnectionPool: &cError while opening a new connection.");
                 exception.printStackTrace();
                 break;
@@ -51,21 +45,17 @@ public class MySQLConnectionPool {
         }
     }
 
-    public void closeConnections()
-    {
+    public void closeConnections() {
         plugin_instance.logMessage("MySQLConnectionPool: &aClosing &e" + database_information.getConnection_count() + "&a connections.");
 
         Iterator<Connection> connection_iterator = connections.iterator();
-        while (connection_iterator.hasNext())
-        {
+        while (connection_iterator.hasNext()) {
             Connection next = connection_iterator.next();
 
-            try
-            {
+            try {
                 if (!next.isClosed())
                     next.close();
-            } catch (Exception exception)
-            {
+            } catch (Exception exception) {
                 plugin_instance.logMessage("MySQLConnectionPool: &cError while closing a connection.");
                 exception.printStackTrace();
                 continue;
@@ -74,8 +64,7 @@ public class MySQLConnectionPool {
         }
     }
 
-    public Connection getNextConnection()
-    {
+    public Connection getNextConnection() {
         // Increment.
         last_used_connection += 1;
 

@@ -12,22 +12,22 @@ import org.bukkit.inventory.ItemStack;
  */
 public class ArmorUtils {
 
-    public static float getArmorDamageNullificationPercent(float armor_val){
-        if(armor_val == 0)
+    public static float getArmorDamageNullificationPercent(float armor_val) {
+        if (armor_val == 0)
             return 1F;
 
         return 1F - (armor_val * 0.04F);
     }
 
-    public static float getEnchantDamageModifier(Player pl){
+    public static float getEnchantDamageModifier(Player pl) {
         ItemStack weapon = pl.getItemInHand();
         float damage_mod = 0.0F;
-        if(weapon != null){
-            if(!(weapon.getType() == Material.BOW) && weapon.getEnchantments().containsKey(Enchantment.DAMAGE_ALL)){
-                damage_mod = (float)weapon.getEnchantments().get(Enchantment.DAMAGE_ALL) * 0.625F;
+        if (weapon != null) {
+            if (!(weapon.getType() == Material.BOW) && weapon.getEnchantments().containsKey(Enchantment.DAMAGE_ALL)) {
+                damage_mod = (float) weapon.getEnchantments().get(Enchantment.DAMAGE_ALL) * 0.625F;
             }
-            if(weapon.getType() == Material.BOW  && weapon.getEnchantments().containsKey(Enchantment.ARROW_DAMAGE)){
-                damage_mod = 0.25F * ((float)weapon.getEnchantments().get(Enchantment.ARROW_DAMAGE) + 1);
+            if (weapon.getType() == Material.BOW && weapon.getEnchantments().containsKey(Enchantment.ARROW_DAMAGE)) {
+                damage_mod = 0.25F * ((float) weapon.getEnchantments().get(Enchantment.ARROW_DAMAGE) + 1);
             }
         }
 
@@ -40,57 +40,57 @@ public class ArmorUtils {
 
     public static int getArmorValue(LivingEntity pl) {
         int armor_val = 0;
-        for(ItemStack is : pl.getEquipment().getArmorContents()){
-            if(is == null || is.getType() == Material.AIR)
+        for (ItemStack is : pl.getEquipment().getArmorContents()) {
+            if (is == null || is.getType() == Material.AIR)
                 continue;
 
             if (is.getItemMeta().hasEnchant(Enchantment.PROTECTION_ENVIRONMENTAL)) {
                 armor_val += (is.getEnchantmentLevel(Enchantment.PROTECTION_ENVIRONMENTAL));
             }
 
-            if(is.getType() == Material.LEATHER_HELMET)
+            if (is.getType() == Material.LEATHER_HELMET)
                 armor_val += 1;
-            if(is.getType() == Material.LEATHER_CHESTPLATE)
+            if (is.getType() == Material.LEATHER_CHESTPLATE)
                 armor_val += 3;
-            if(is.getType() == Material.LEATHER_LEGGINGS)
+            if (is.getType() == Material.LEATHER_LEGGINGS)
                 armor_val += 2;
-            if(is.getType() == Material.LEATHER_BOOTS)
+            if (is.getType() == Material.LEATHER_BOOTS)
                 armor_val += 1;
 
-            if(is.getType() == Material.CHAINMAIL_HELMET)
+            if (is.getType() == Material.CHAINMAIL_HELMET)
                 armor_val += 2;
-            if(is.getType() == Material.CHAINMAIL_CHESTPLATE)
+            if (is.getType() == Material.CHAINMAIL_CHESTPLATE)
                 armor_val += 5;
-            if(is.getType() == Material.CHAINMAIL_LEGGINGS)
+            if (is.getType() == Material.CHAINMAIL_LEGGINGS)
                 armor_val += 4;
-            if(is.getType() == Material.CHAINMAIL_BOOTS)
+            if (is.getType() == Material.CHAINMAIL_BOOTS)
                 armor_val += 1;
 
-            if(is.getType() == Material.IRON_HELMET)
+            if (is.getType() == Material.IRON_HELMET)
                 armor_val += 2;
-            if(is.getType() == Material.IRON_CHESTPLATE)
+            if (is.getType() == Material.IRON_CHESTPLATE)
                 armor_val += 6;
-            if(is.getType() == Material.IRON_LEGGINGS)
+            if (is.getType() == Material.IRON_LEGGINGS)
                 armor_val += 5;
-            if(is.getType() == Material.IRON_BOOTS)
+            if (is.getType() == Material.IRON_BOOTS)
                 armor_val += 2;
 
-            if(is.getType() == Material.DIAMOND_HELMET)
+            if (is.getType() == Material.DIAMOND_HELMET)
                 armor_val += 3;
-            if(is.getType() == Material.DIAMOND_CHESTPLATE)
+            if (is.getType() == Material.DIAMOND_CHESTPLATE)
                 armor_val += 8;
-            if(is.getType() == Material.DIAMOND_LEGGINGS)
+            if (is.getType() == Material.DIAMOND_LEGGINGS)
                 armor_val += 6;
-            if(is.getType() == Material.DIAMOND_BOOTS)
+            if (is.getType() == Material.DIAMOND_BOOTS)
                 armor_val += 3;
 
-            if(is.getType() == Material.GOLD_HELMET)
+            if (is.getType() == Material.GOLD_HELMET)
                 armor_val += 2;
-            if(is.getType() == Material.GOLD_CHESTPLATE)
+            if (is.getType() == Material.GOLD_CHESTPLATE)
                 armor_val += 5;
-            if(is.getType() == Material.GOLD_LEGGINGS)
+            if (is.getType() == Material.GOLD_LEGGINGS)
                 armor_val += 3;
-            if(is.getType() == Material.GOLD_BOOTS)
+            if (is.getType() == Material.GOLD_BOOTS)
                 armor_val += 1;
         }
 

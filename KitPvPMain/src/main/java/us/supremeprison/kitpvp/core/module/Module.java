@@ -7,7 +7,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import us.supremeprison.kitpvp.core.KitPvP;
-import us.supremeprison.kitpvp.modules.Kits.Kit;
 
 /**
  * @author Connor Hollasch
@@ -25,8 +24,11 @@ public abstract class Module implements Listener {
     @Setter
     private boolean isEnabled = false;
 
-    public void onEnable() {}
-    public void onDisable() {}
+    public void onEnable() {
+    }
+
+    public void onDisable() {
+    }
 
     public int schedule(Runnable runnable) {
         if (parent_plugin.isEnabled())

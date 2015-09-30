@@ -3,7 +3,6 @@ package us.supremeprison.kitpvp.core.user;
 import us.supremeprison.kitpvp.core.user.attachment.Attachment;
 import us.supremeprison.kitpvp.core.user.attachment.AttachmentManager;
 
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**

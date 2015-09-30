@@ -14,8 +14,8 @@ public enum MySQLVars {
 
     CREATE_ATTACHMENT_TABLE("CREATE TABLE IF NOT EXISTS `%db%`.`user_attachments`(" +
             "`uuid` VARCHAR(36) NOT NULL, " +
-            "`attachment_data` TEXT NOT NULL, " +
-            "PRIMARY KEY (`uuid`, `attachment_data`));"),
+            "`attachment_data` TEXT(10000) NOT NULL, " +
+            "PRIMARY KEY (`uuid`));"),
     GET_ALL_ATTACHMENTS("SELECT attachment_data FROM `%db%`.`user_attachments` WHERE uuid=?;"),
     INSERT_INTO_ATTACHMENTS("INSERT INTO `%db%`.`user_attachments`(`uuid`, `attachment_data`) " +
             "VALUES(?, ?) " +

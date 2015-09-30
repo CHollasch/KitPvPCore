@@ -1,5 +1,10 @@
 package us.supremeprison.kitpvp.modules.Economy;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import us.supremeprison.kitpvp.core.command.CommandModule;
 import us.supremeprison.kitpvp.core.command.DynamicCommandRegistry;
 import us.supremeprison.kitpvp.core.module.Module;
@@ -8,17 +13,12 @@ import us.supremeprison.kitpvp.core.module.modifiers.ModuleDependency;
 import us.supremeprison.kitpvp.core.user.User;
 import us.supremeprison.kitpvp.core.user.attachment.Attachment;
 import us.supremeprison.kitpvp.core.user.attachment.common.DoubleAttachment;
-import us.supremeprison.kitpvp.core.util.RoundingMap;
+import us.supremeprison.kitpvp.core.util.KeyRoundingMap;
 import us.supremeprison.kitpvp.core.util.config.ConfigOption;
 import us.supremeprison.kitpvp.core.util.messages.Form;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.text.NumberFormat;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * @author Connor Hollasch
@@ -32,13 +32,13 @@ public class Economy extends Module {
     private static final NumberFormat cashFormat = NumberFormat.getCurrencyInstance();
 
     @ConfigOption("ITEM-WORTH")
-    public static HashMap<String, Double> item_worth = new HashMap<String, Double>() {
+    public static LinkedHashMap<String, Double> item_worth = new LinkedHashMap<String, Double>() {
         {
             put(Material.IRON_INGOT.toString(), 25000.0);
             put(Material.GOLD_INGOT.toString(), 100000.0);
             put(Material.DIAMOND.toString(), 500000.0);
             put(Material.EMERALD.toString(), 1000000.0);
-            put(Material.NETHER_STAR.toString(), 100000000.0);
+            put(Material.getMaterial(377).toString(), 100000000.0);
         }
     };
 
@@ -144,8 +144,12 @@ public class Economy extends Module {
     }
 
     public static Material[] chanceRandomBill(int amount) {
-        RoundingMap<Double, String> cashValueChances = new RoundingMap<>();
-        double total = 0.0; for (double x : item_worth.values()) { total += x; }
+        KeyRoundingMap<Double, String> cashValueChances = new KeyRoundingMap<>();
+
+        double total = 0.0;
+        for (double x : item_worth.values()) {
+            total += x;
+        }
 
         double max = 0.0;
 

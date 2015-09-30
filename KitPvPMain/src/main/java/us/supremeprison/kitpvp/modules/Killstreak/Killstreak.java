@@ -22,7 +22,7 @@ import java.util.*;
 @ModuleDependency
 public class Killstreak extends Module {
 
-    private static final String KS_REWARD_ATTACHMENT = "killstreak_rewards";
+    protected static final String KS_REWARD_ATTACHMENT = "killstreak_rewards";
 
     @Getter
     private static Killstreak module_instance;
@@ -50,7 +50,7 @@ public class Killstreak extends Module {
                     return compile;
 
                 if (compile.endsWith(","))
-                    compile = compile.substring(0, compile.length()-1);
+                    compile = compile.substring(0, compile.length() - 1);
 
                 return compile;
             }
@@ -78,8 +78,6 @@ public class Killstreak extends Module {
     public void addKillstreakReward(KillstreakReward reward) {
         killstreak_rewards_sorted.put(reward, reward.getKills());
         killstreak_rewards_sorted = Common.sortHashMapByValues(killstreak_rewards_sorted);
-
-        System.out.println(killstreak_rewards_sorted);
     }
 
     public HashMap<KillstreakReward, Integer> getPlayer_killstreak_rewards(Player player) {
@@ -91,6 +89,9 @@ public class Killstreak extends Module {
     }
 
     public void addKill(Player player) {
+        if (player == null)
+            return;
+
         User user = User.fromPlayer(player);
         verifyUserdata(user);
         int ks = (int) user.getUserdata().get("killstreak") + 1;
@@ -98,6 +99,8 @@ public class Killstreak extends Module {
         user.getUserdata().put("killstreak", ks);
 
         KillstreakReward reward = getExactReward(ks);
+        if (reward == null)
+            return;
 
         List<KillstreakReward> user_rewards = user.getAttachments().getAttachment(KS_REWARD_ATTACHMENT);
         if (user_rewards.contains(reward)) {
